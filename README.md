@@ -46,9 +46,8 @@ Most mod.io download tools are broken, outdated, or unsafe—and frankly, frustr
 
 
 ## Legal
-
-This tool uses the official mod.io API.
-You are responsible for complying with mod.io's terms of service.
+This tool uses the official mod.io API. Users are responsible for complying with mod.io's Terms of Service.
+This tool is not affiliated with, endorsed by, or officially supported by mod.io. Use at your own risk.
 
 ## 🔴Access limitations (important)🔴
 
