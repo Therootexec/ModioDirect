@@ -65,3 +65,6 @@ Try a public game/mod to verify your API key works. Private/unlisted mods requir
 
 Future updates may add OAuth support if allowed by mod.io policy.
 
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
