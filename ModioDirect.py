@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # ModioDirect by TheRootExec
-# Crash-proof direct downloader for mod.io (official API only)
+# Direct Downloader for mod.io (official API only)
 
 import json
 import os
@@ -664,7 +664,7 @@ if __name__ == "__main__":
 """
 Simulated full run (example):
 
-ModioDirect - crash-proof mod.io downloader
+ModioDirect - mod.io downloader
 Enter your mod.io API key: 12345INVALID
 [Error] Invalid API key (401 Unauthorized).
 Enter your mod.io API key: 67890VALID
@@ -681,10 +681,5 @@ Downloading... 100%
 Download another mod? (y/n): n
 [Info] Exiting.
 
-Why it will not crash:
-- Every network call is wrapped in try/except.
-- All JSON responses are type-checked before use.
-- No list indexing occurs without length checks.
-- Invalid inputs re-prompt instead of exiting abruptly.
-- Top-level exceptions are caught and converted to clear errors.
 """
+
