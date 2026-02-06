@@ -35,7 +35,7 @@ Paste a URL like:
 ```
 https://mod.io/g/GAME/m/example-mod
 ```
-## Security Notice:
+## :exclamation: Security Notice:
    Your mod.io API key is private. Never share it or post it publicly.
    ModioDirect stores the key locally and only uses it to communicate
    with the official mod.io API.
