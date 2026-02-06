@@ -45,3 +45,18 @@ ModioDirect exists to be boring, correct, and reliable.
 
 This tool uses the official mod.io API.
 You are responsible for complying with mod.io's terms of service.
+
+## Access limitations (important)
+
+Some games/mods are private, unlisted, or require OAuth access. In those cases, the mod.io API returns 404 even if the URL exists. This is an access restriction, not a bug in ModioDirect.
+
+If you see:
+
+```
+[Error] Game not accessible (404). The game may be private, unpublished, or require OAuth access.
+```
+
+Try a public game/mod to verify your API key works. Private/unlisted mods require OAuth and are not accessible with API keys alone.
+
+Future updates may add OAuth support if allowed by mod.io policy.
+
