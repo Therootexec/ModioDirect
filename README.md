@@ -50,7 +50,7 @@ Most mod.io download tools are broken, outdated, or unsafe—and frankly, frustr
 This tool uses the official mod.io API.
 You are responsible for complying with mod.io's terms of service.
 
-## Access limitations (important)
+## 🔴Access limitations (important)🔴
 
 Some games/mods are private, unlisted, or require OAuth access. In those cases, the mod.io API returns 404 even if the URL exists. This is an access restriction, not a bug in ModioDirect.
 
