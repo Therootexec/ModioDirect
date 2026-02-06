@@ -67,18 +67,15 @@ Future updates may add OAuth support if allowed by mod.io policy.
 
 ## Upcoming Features Updates
  ModioDirect is actively maintained. The following features are planned for future releases:
+- Batch mod downloads
+  Download multiple mods in one run using a text file containing mod.io URLs.
+- Optional auto-install to game mod folders
+  Detect common game mod directories (opt-in only, user confirmation required).
+- Windows standalone executable (.exe)
+  A portable build for Windows users that does not require Python.
+- PyPI package distribution
+  Install ModioDirect using pip install modiodirect and run it as a system command.
 
--Batch mod downloads
-Download multiple mods in one run using a text file containing mod.io URLs.
-
--Optional auto-install to game mod folders
-Detect common game mod directories (opt-in only, user confirmation required).
-
--Windows standalone executable (.exe)
-A portable build for Windows users that does not require Python.
-
--PyPI package distribution
-Install ModioDirect using pip install modiodirect and run it as a system command.
 
 ##Feature requests and contributions are welcome via GitHub issues.
 
