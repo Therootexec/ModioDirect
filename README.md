@@ -38,8 +38,7 @@ https://mod.io/g/spaceengineers/m/assault-weapons-pack1
 
 ## Why this exists
 
-Most mod.io download tools are broken, outdated, or unsafe.
-ModioDirect exists to be simple, reliable, and safe. It also allows manual downloads using an API key, bypassing the official game client
+Most mod.io download tools are broken, outdated, or unsafe—and frankly, frustrating to use. ModioDirect was made to fix that: simple, reliable, and safe. It gives you full control, letting you manually download mods with an API key and even bypass the official game client when needed. No clutter, no crashes, just the mods you want, when you want them.
 
 #Feature Comparison Table With Others
 | Feature | ModioDirect | SEModDownloaderMod.io | ModioModNetworker |
