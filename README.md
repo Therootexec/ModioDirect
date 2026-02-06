@@ -33,7 +33,7 @@ python modiodirect.py --no-config
 Paste a URL like:
 
 ```
-https://mod.io/g/spaceengineers/m/assault-weapons-pack1
+https://mod.io/g/GAME/m/example-mod
 ```
 # *SIMPLY WALKTHROUGH*:
 <img width="1310" height="332" alt="Screenshot 2026-02-06 162920" src="https://github.com/user-attachments/assets/871142df-72c3-42b2-9655-f25d2b956488" />
