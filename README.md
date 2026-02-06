@@ -2,7 +2,9 @@
 
 **ModioDirect** is a crash-proof, single-file CLI tool for downloading mods
 directly from **mod.io** using the official API.
-![ModioDirect-logo](https://github.com/user-attachments/assets/29b977b9-cca6-4ffc-839a-6e2984d7177d)
+
+<img width="1007" height="678" alt="ModioDirect-logo" src="https://github.com/user-attachments/assets/b4de5993-b6fb-4980-98ba-ed63c7871732" />
+<img width="1007" height="678" alt="ModioDirect-logo" src="https://github.com/user-attachments/assets/b4de5993-b6fb-4980-98ba-ed63c7871732" />
 
 ## Features
 - Official mod.io API only
