@@ -59,6 +59,8 @@ If you see:
 ```
 [Error] Game not accessible (404). The game may be private, unpublished, or require OAuth access.
 ```
+<img width="1093" height="309" alt="Screenshot 2026-02-06 170047" src="https://github.com/user-attachments/assets/eb1148df-ef85-468f-a21b-d99cd26901db" />
+
 
 Try a public game/mod to verify your API key works. Private/unlisted mods require OAuth and are not accessible with API keys alone.
 
