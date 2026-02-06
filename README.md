@@ -1,6 +1,6 @@
 # ModioDirect
 
-**ModioDirect is a lightweight, single-file CLI that reliably downloads mods straight from mod.io via the official API—safe, fast, and hassle-free.
+*ModioDirect is a lightweight, single-file CLI that reliably downloads mods straight from mod.io via the official API—safe, fast, and hassle-free.
 
 <img width="1007" height="678" alt="ModioDirect-logo" src="https://github.com/user-attachments/assets/b4de5993-b6fb-4980-98ba-ed63c7871732" />
 
