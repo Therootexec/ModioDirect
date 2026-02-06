@@ -4,7 +4,6 @@
 directly from **mod.io** using the official API.
 
 <img width="1007" height="678" alt="ModioDirect-logo" src="https://github.com/user-attachments/assets/b4de5993-b6fb-4980-98ba-ed63c7871732" />
-<img width="1007" height="678" alt="ModioDirect-logo" src="https://github.com/user-attachments/assets/b4de5993-b6fb-4980-98ba-ed63c7871732" />
 
 ## Features
 - Official mod.io API only
