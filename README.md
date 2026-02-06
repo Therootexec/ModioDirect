@@ -41,6 +41,13 @@ https://mod.io/g/spaceengineers/m/assault-weapons-pack1
 Most mod.io download tools are broken, outdated, or unsafe.
 ModioDirect exists to be simple, reliable, and safe.
 
+#Feature Comparison Table With Others
+"Feature","ModioDirect","SEModDownloaderMod.io","ModioModNetworker"
+"CLI Only","✅","❌","❌"
+"No GUI Needed","✅","❌","❌"
+"Single File","✅","❌","❌"
+"Cross-Game","✅","Limited","Game-Specific"
+
 ## Legal
 
 This tool uses the official mod.io API.
