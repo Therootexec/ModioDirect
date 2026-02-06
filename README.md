@@ -77,7 +77,7 @@ Future updates may add OAuth support if allowed by mod.io policy.
   Install ModioDirect using pip install modiodirect and run it as a system command.
 
 
-## Feature requests and contributions are welcome via GitHub issues.
+## :handshake: Feature requests and contributions are welcome via GitHub issues.
 
 
 
