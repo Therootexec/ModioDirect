@@ -35,7 +35,7 @@ Paste a URL like:
 ```
 https://mod.io/g/spaceengineers/m/assault-weapons-pack1
 ```
-# SIMPLY WALKTHROUGH:
+# "SIMPLY WALKTHROUGH:
 <img width="1310" height="332" alt="Screenshot 2026-02-06 162920" src="https://github.com/user-attachments/assets/871142df-72c3-42b2-9655-f25d2b956488" />
 <img width="1094" height="368" alt="Screenshot 2026-02-06 164436" src="https://github.com/user-attachments/assets/f351d3f7-8bc0-46b5-8c8b-1fe03af22332" />
 
