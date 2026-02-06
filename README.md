@@ -66,9 +66,13 @@ If you see:
 <img width="1093" height="309" alt="Screenshot 2026-02-06 170047" src="https://github.com/user-attachments/assets/eb1148df-ef85-468f-a21b-d99cd26901db" />
 
 
-Try a public game/mod to verify your API key works. "Private/unlisted mods require OAuth and are not accessible with API keys alone."
+API Key Limitations
+Use a public game or mod to verify that your API key is working.
+API keys can only access publicly available content.
 
-Future updates may add OAuth support if allowed by mod.io policy.
+Private or unlisted mods are not accessible using API keys alone, as they require OAuth-based authentication.
+
+OAuth support is not currently implemented in ModioDirect. Future updates may add OAuth support if permitted by mod.io’s policies.
 
 ## Upcoming Features Updates
  ModioDirect is actively maintained. The following features are planned for future releases:
