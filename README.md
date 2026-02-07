@@ -42,7 +42,6 @@ https://mod.io/g/GAME/m/example-mod
 
 # *SIMPLY WALKTHROUGH*:
 <img width="1310" height="332" alt="Screenshot 2026-02-06 162920" src="https://github.com/user-attachments/assets/871142df-72c3-42b2-9655-f25d2b956488" />
-<img width="476" height="178" alt="Screenshot 2026-02-07 194452" src="https://github.com/user-attachments/assets/c4c045a3-63ed-4ebd-a4c9-ece3a2a5ae9a" />
 <img width="1094" height="368" alt="Screenshot 2026-02-06 164436" src="https://github.com/user-attachments/assets/f351d3f7-8bc0-46b5-8c8b-1fe03af22332" />
 
 
