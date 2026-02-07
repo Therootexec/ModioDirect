@@ -21,7 +21,7 @@ Supports games like Space Engineers, SnowRunner, and more.
 
 ## How To Use It
 ```bash
-python modiodirect.py or double click the modiodirect.py
+python modiodirect.py OR double click the modiodirect.py
 ```
 ## Add Your Mod.io API Key E.g 
 ```bash
