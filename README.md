@@ -90,6 +90,8 @@ OAuth support is not currently implemented in ModioDirect. Future updates may ad
 
 
 ## :handshake: Feature requests and contributions are welcome via GitHub issues.
+## Author
+TheRootExec — GitHub: https://github.com/Therootexec/ModioDirect
 
 
 
