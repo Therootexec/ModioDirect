@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import time
+import subprocess
 from urllib.parse import urlparse, unquote
 
 # Optional tqdm
@@ -15,7 +16,7 @@ try:
 except Exception:
     tqdm = None
 
-# Required requests
+# Required requests (may be installed on demand)
 try:
     import requests  # type: ignore
 except Exception:
@@ -49,6 +50,30 @@ def print_banner():
     print("\n             ModioDirect Downloader Tool")
     print("                     by TheRootExec")
     print("-------------------------------------------------------")
+
+
+def try_auto_install_requests():
+    global requests
+    if requests is not None:
+        return True
+    print_error("The 'requests' library is required but not installed.")
+    choice = input("Install requirements now? (y/n): ").strip().lower()
+    if choice != "y":
+        return False
+    try:
+        cmd = [sys.executable, "-m", "pip", "install", "requests"]
+        subprocess.run(cmd, check=False)
+    except Exception as exc:
+        print_error(f"Failed to run pip: {exc}")
+        return False
+    # Re-try import
+    try:
+        import requests as _requests  # type: ignore
+        requests = _requests
+        return True
+    except Exception:
+        print_error("Requests is still not available after install attempt.")
+        return False
 
 
 def safe_json(resp):
@@ -140,7 +165,9 @@ def prompt_api_key(config_path, use_config):
 
 def prompt_mod_url():
     while True:
-        url = input("Enter mod.io mod URL: ").strip()
+        url = input("Enter mod.io mod URL (or 'q' to exit): ").strip()
+        if url.lower() in ("q", "quit", "exit"):
+            return None, None
         if not url:
             print_error("URL cannot be empty.")
             continue
@@ -563,8 +590,8 @@ def download_file(url, filename):
 
 def main():
     print_banner()
-    if requests is None:
-        print_error("The 'requests' library is required. Install it with: pip install requests")
+    if not try_auto_install_requests():
+        print_error("Cannot continue without 'requests'.")
         return
 
     config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), CONFIG_NAME)
@@ -573,6 +600,9 @@ def main():
 
     while True:
         game_slug, mod_slug = prompt_mod_url()
+        if game_slug is None and mod_slug is None:
+            print_info("Thanks for using ModioDirect.")
+            return
 
         game_id, err = resolve_game_id(api_key, game_slug)
         if err:
@@ -649,8 +679,23 @@ def main():
         # Ask if user wants another
         again = input("Download another mod? (y/n): ").strip().lower()
         if again != "y":
-            print_info("Exiting.")
+            print_info("Thanks for using ModioDirect.")
             return
+
+
+def maybe_pause_on_exit():
+    # Help Windows users who double-click the .py (console closes immediately).
+    if os.name != "nt":
+        return
+    if "--no-pause" in sys.argv:
+        return
+    # Only pause for direct script runs without extra args.
+    if len(sys.argv) > 1:
+        return
+    try:
+        input("Press Enter to exit...")
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":
@@ -660,6 +705,8 @@ if __name__ == "__main__":
         print_error("Interrupted by user.")
     except Exception as exc:
         print_error(f"Unexpected error: {exc}")
+    finally:
+        maybe_pause_on_exit()
 
 """
 Simulated full run (example):
@@ -682,4 +729,3 @@ Download another mod? (y/n): n
 [Info] Exiting.
 
 """
-
