@@ -19,12 +19,15 @@ Supports games like Space Engineers, SnowRunner, and more.
 - Python 3.9+
 - `pip install requests tqdm`
 
-## Usage
+## How To Use It
 ```bash
-python modiodirect.py
+python modiodirect.py or double click the modiodirect.py
 ```
-
-To avoid saving the API key to `config.json`:
+## Add Your Mod.io API Key E.g 
+```bash
+0923d9369664ba08bd91c67.........
+```
+(optional) To avoid saving the API key to `config.json`:
 
 ```bash
 python modiodirect.py --no-config
