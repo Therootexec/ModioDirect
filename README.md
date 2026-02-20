@@ -75,9 +75,7 @@ If you see:
 API Key Limitations
 Use a public game or mod to verify that your API key is working.
 API keys can only access publicly available content.
-
 Private or unlisted mods are not accessible using API keys alone, as they require OAuth-based authentication.
-
 OAuth support is not currently implemented in ModioDirect. Future updates may add OAuth support if permitted by mod.io’s policies.
 
 ## Upcoming Features Updates
