@@ -95,7 +95,7 @@ OAuth support is not currently implemented in ModioDirect. Future updates may ad
 ## :handshake: Feature requests and contributions are welcome via GitHub issues.
 ## 🌟 Special Thanks
 
-Thanks to [@Diversion-CTF](https://github.com/Diversion-CTF) For helping out on the Logo
+Thanks to [@Diversion-CTF](https://github.com/Diversion-CTF) For helping with the logo
 
 
 
