@@ -3,7 +3,7 @@
 **ModioDirect is a lightweight, single-file CLI that reliably downloads mods straight from mod.io via the official API—safe, fast, and free for use. It also allows manual downloads using an API key, bypassing the official game client.
 Supports games like Space Engineers, SnowRunner, and more.
 
-<img width="512" height="512" alt="image" src="https://github.com/user-attachments/assets/d03cb0c7-a100-4b5a-be46-5accec7b09bb" />
+![modioDirect](https://github.com/user-attachments/assets/1c5d45b5-22fd-4c0e-b6ce-c99228de6cd1)
 
 
 
