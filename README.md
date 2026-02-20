@@ -92,7 +92,6 @@ OAuth support is not currently implemented in ModioDirect. Future updates may ad
   Install ModioDirect using pip install modiodirect and run it as a system command.
 
 
-## :handshake: Feature requests and contributions are welcome via GitHub issues.
 ## 🌟 Special Thanks
 
 Thanks to [@Diversion-CTF](https://github.com/Diversion-CTF) For helping with the logo
