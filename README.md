@@ -57,17 +57,6 @@ This will scan common Steam/Epic install locations and let you pick a mod folder
 ```
 file:C:\path\to\mods.txt
 ```
-
-Example file:
-
-```
-https://mod.io/g/spaceengineers/m/assault-weapons-pack1
-https://mod.io/g/frenzy-vr/m/black-ops-ray-gun
-## :exclamation: Security Notice:
-   Your mod.io API key is private. Never share it or post it publicly.
-   ModioDirect stores the key locally and only uses it to communicate
-   with the official mod.io API.
-
 # *SIMPLY WALKTHROUGH*:
 <img width="1310" height="332" alt="Screenshot 2026-02-06 162920" src="https://github.com/user-attachments/assets/871142df-72c3-42b2-9655-f25d2b956488" />
 <img width="1094" height="368" alt="Screenshot 2026-02-06 164436" src="https://github.com/user-attachments/assets/f351d3f7-8bc0-46b5-8c8b-1fe03af22332" />
@@ -87,10 +76,6 @@ This tool is not affiliated with, endorsed by, or officially supported by mod.io
 Some games/mods are private, unlisted, or require OAuth access. In those cases, the mod.io API returns 404 even if the URL exists. This is an access restriction, not a bug in ModioDirect.
 
 If you see:
-
-```
-[Error] Game not accessible (404). The game may be private, unpublished, or require OAuth access.
-```
 <img width="1093" height="309" alt="Screenshot 2026-02-06 170047" src="https://github.com/user-attachments/assets/eb1148df-ef85-468f-a21b-d99cd26901db" />
 
 
