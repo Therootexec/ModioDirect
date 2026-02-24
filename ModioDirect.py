@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-# ModioDirect by TheRootExec
-# Direct Downloader for mod.io (official API only)
 
 import json
 import os
@@ -8,15 +6,18 @@ import re
 import sys
 import time
 import subprocess
+import argparse
+import shutil
+import zipfile
+import tempfile
+import traceback
 from urllib.parse import urlparse, unquote
 
-# Optional tqdm
 try:
     from tqdm import tqdm  # type: ignore
 except Exception:
     tqdm = None
 
-# Required requests (may be installed on demand)
 try:
     import requests  # type: ignore
 except Exception:
@@ -24,9 +25,17 @@ except Exception:
 
 
 API_BASE = "https://api.mod.io/v1"
+VERSION = "1.0.1"
 CONFIG_NAME = "config.json"
 USER_AGENT = "ModioDirect/1.1 (TheRootExec)"
-DOWNLOAD_DIR = "downloads"
+DOWNLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "downloads")
+CACHE_PATH = os.path.join(DOWNLOAD_DIR, "mod_cache.json")
+DEBUG = False
+GAMES_DB_PATHS = [
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "games.json"),
+    os.path.join(DOWNLOAD_DIR, "games.json"),
+    os.path.join(os.path.expanduser("~"), "Downloads", "games.json"),
+]
 URL_REGEX = re.compile(
     r"^https?://(?:www\.)?mod\.io/g/([^/]+)/m/([^/?#]+)",
     re.IGNORECASE,
@@ -41,6 +50,74 @@ def print_info(msg):
     print(f"[Info] {msg}")
 
 
+def print_status(msg):
+    print(f"[Status] {msg}")
+
+
+def cleanup_temp_file(path):
+    try:
+        if not path:
+            return
+        parent = os.path.dirname(path)
+        if os.path.isfile(path):
+            os.remove(path)
+        if os.path.isdir(parent) and os.path.basename(parent).startswith("modiodirect_"):
+            shutil.rmtree(parent, ignore_errors=True)
+    except Exception:
+        pass
+
+
+def load_cache():
+    try:
+        if os.path.isfile(CACHE_PATH):
+            with open(CACHE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                return data
+    except Exception:
+        pass
+    return {"mods": {}}
+
+
+def save_cache(cache):
+    try:
+        os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+        with open(CACHE_PATH, "w", encoding="utf-8") as f:
+            json.dump(cache, f, indent=2)
+        return True
+    except Exception:
+        return False
+
+
+def get_expected_size(file_obj):
+    if not isinstance(file_obj, dict):
+        return None
+    size = file_obj.get("filesize")
+    if isinstance(size, int):
+        return size
+    download = file_obj.get("download")
+    if isinstance(download, dict):
+        size = download.get("filesize")
+        if isinstance(size, int):
+            return size
+    return None
+
+
+def friendly_error(err):
+    if not isinstance(err, str):
+        return "Unexpected error occurred."
+    s = err.lower()
+    if "401" in s or "403" in s or "unauthorized" in s or "oauth" in s or "private" in s:
+        return "Mod is private, inaccessible, or requires authentication."
+    if "404" in s or "not found" in s:
+        return "Mod or game not found."
+    if "429" in s or "rate" in s:
+        return "Rate limited. Try again later."
+    if "network" in s or "timeout" in s:
+        return "Network error occurred."
+    return "Unexpected error occurred."
+
+
 def print_banner():
     print(r" __  __           _ _       _____  _               _   ")
     print(r"|  \/  | ___   __| (_) ___ |  __ \(_)_ __ ___  ___| |_ ")
@@ -48,7 +125,7 @@ def print_banner():
     print(r"| |  | | (_) | (_| | | (_) | |__| | | | |  __/ (__| |_ ")
     print(r"|_|  |_|\___/ \__,_|_|\___/|_____/|_|_|  \___|\___|\__|")
     print("\n             ModioDirect Downloader Tool")
-    print("                     by TheRootExec")
+    print("                 by TheRootExec v1.0.1")
     print("-------------------------------------------------------")
 
 
@@ -66,7 +143,6 @@ def try_auto_install_requests():
     except Exception as exc:
         print_error(f"Failed to run pip: {exc}")
         return False
-    # Re-try import
     try:
         import requests as _requests  # type: ignore
         requests = _requests
@@ -89,9 +165,11 @@ def safe_request(method, url, **kwargs):
         return None
     try:
         return requests.request(method, url, **kwargs)
-    except Exception as exc:
-        print_error(f"Network error: {exc}")
+    except Exception:
+        print_error("Network error occurred.")
         return None
+
+
 
 
 def load_config(config_path):
@@ -118,7 +196,6 @@ def save_config(config_path, data):
 
 
 def validate_api_key(api_key):
-    # Test API key by listing 1 game
     url = f"{API_BASE}/games"
     params = {"api_key": api_key, "limit": 1}
     headers = {"User-Agent": USER_AGENT}
@@ -160,18 +237,50 @@ def prompt_api_key(config_path, use_config):
                 save_config(config_path, config)
             return api_key
         print_error(msg)
-        api_key = ""  # force re-prompt
+        api_key = ""
+
+
+def normalize_path_input(value):
+    if not isinstance(value, str):
+        return ""
+    return value.strip().strip("\"").strip("'")
 
 
 def prompt_mod_url():
     while True:
-        url = input("Enter mod.io mod URL (or 'q' to exit): ").strip()
-        if url.lower() in ("q", "quit", "exit"):
-            return None, None
-        if not url:
+        raw = input("Enter mod URL (or file:PATH, q to exit, help): ").strip()
+        install_requested = False
+        force_requested = False
+        if " --install" in raw:
+            raw = raw.replace(" --install", "").strip()
+            install_requested = True
+        if " --force" in raw:
+            raw = raw.replace(" --force", "").strip()
+            force_requested = True
+        if raw.lower() in ("help", "?"):
+            print("Usage:")
+            print("  Paste a mod.io URL")
+            print("  Or type file:C:\\path\\to\\mods.txt for batch")
+            print("  Add --install to auto-install if a mod folder is detected")
+            print("  Type q to exit")
+            continue
+        if raw.lower() in ("q", "quit", "exit"):
+            return None, None, install_requested, force_requested
+        if raw.lower().startswith("file:"):
+            path = normalize_path_input(raw[5:])
+            if not path:
+                print_error("Batch file path is empty.")
+                continue
+            return "BATCH_FILE", path, install_requested, force_requested
+        # Allow direct path to batch file without file: prefix
+        if raw.lower().endswith(".txt"):
+            path = normalize_path_input(raw)
+            if os.path.isfile(path):
+                return "BATCH_FILE", path, install_requested, force_requested
+        if not raw:
             print_error("URL cannot be empty.")
             continue
-        match = URL_REGEX.search(url)
+        match = URL_REGEX.search(raw)
         if not match:
             print_error("Invalid mod.io URL. Expected: https://mod.io/g/<game_slug>/m/<mod_slug>")
             continue
@@ -180,12 +289,43 @@ def prompt_mod_url():
         if not game_slug or not mod_slug:
             print_error("Could not parse game_slug or mod_slug from URL.")
             continue
-        return game_slug, mod_slug
+        return game_slug, mod_slug, install_requested, force_requested
+
+
+def load_batch_urls(file_path):
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+    except Exception as exc:
+        print_error(f"Failed to read batch file: {exc}")
+        return []
+    urls = []
+    for line in lines:
+        if not isinstance(line, str):
+            continue
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        urls.append(line)
+    return urls
+
+
+def parse_modio_url(url):
+    if not isinstance(url, str):
+        return None, None
+    raw = url.strip().split()[0]
+    match = URL_REGEX.search(raw)
+    if not match:
+        return None, None
+    game_slug = match.group(1).strip()
+    mod_slug = match.group(2).strip()
+    if not game_slug or not mod_slug:
+        return None, None
+    return game_slug, mod_slug
 
 
 def resolve_game_id(api_key, game_slug):
     url = f"{API_BASE}/games"
-    # Filtering uses direct field parameters, e.g. name_id=<slug>
     params = {"api_key": api_key, "name_id": game_slug, "limit": 1}
     headers = {"User-Agent": USER_AGENT}
     resp = safe_request("GET", url, params=params, headers=headers, timeout=15)
@@ -202,12 +342,10 @@ def resolve_game_id(api_key, game_slug):
         return None, "Empty or invalid API response while resolving game."
     items = data.get("data")
     if not isinstance(items, list) or len(items) == 0:
-        # Fallback: search and match by name_id/slug
         fallback_id, fallback_err = fallback_search_game_id(api_key, game_slug)
         if fallback_id is not None:
             return fallback_id, None
         return None, fallback_err or "Game not found for provided game_slug."
-    # Never index without length check:
     game = items[0] if len(items) > 0 else None
     if not isinstance(game, dict):
         return None, "Unexpected game data format."
@@ -231,7 +369,6 @@ def match_slug(item, slug):
 
 def fallback_search_game_id(api_key, game_slug):
     url = f"{API_BASE}/games"
-    # _q is the documented full-text search parameter
     params = {"api_key": api_key, "_q": game_slug, "limit": 100}
     headers = {"User-Agent": USER_AGENT}
     resp = safe_request("GET", url, params=params, headers=headers, timeout=15)
@@ -259,7 +396,6 @@ def fallback_search_game_id(api_key, game_slug):
 
 def resolve_mod_id(api_key, game_id, mod_slug):
     url = f"{API_BASE}/games/{game_id}/mods"
-    # Filtering uses direct field parameters, e.g. name_id=<slug>
     params = {"api_key": api_key, "name_id": mod_slug, "limit": 1}
     headers = {"User-Agent": USER_AGENT}
     resp = safe_request("GET", url, params=params, headers=headers, timeout=15)
@@ -270,7 +406,6 @@ def resolve_mod_id(api_key, game_id, mod_slug):
     if resp.status_code == 429:
         return None, "Rate limited (429) while resolving mod."
     if resp.status_code == 404:
-        # Some API keys are restricted; try global mods endpoint as fallback
         fallback_id, fallback_err = resolve_mod_id_global(api_key, game_id, mod_slug)
         if fallback_id is not None:
             return fallback_id, None
@@ -282,7 +417,6 @@ def resolve_mod_id(api_key, game_id, mod_slug):
         return None, "Empty or invalid API response while resolving mod."
     items = data.get("data")
     if not isinstance(items, list) or len(items) == 0:
-        # Fallback: search and match by name_id/slug
         fallback_id, fallback_err = fallback_search_mod_id(api_key, game_id, mod_slug)
         if fallback_id is not None:
             return fallback_id, None
@@ -308,11 +442,9 @@ def resolve_mod_id_global(api_key, game_id, mod_slug):
     if resp.status_code == 429:
         return None, "Rate limited (429) while resolving mod (global)."
     if resp.status_code == 404:
-        # Try a global search by query and filter client-side
         search_id, search_err = resolve_mod_id_global_search(api_key, game_id, mod_slug)
         if search_id is not None:
             return search_id, None
-        # If mod_slug is numeric, try direct mod lookup
         numeric_id, numeric_err = resolve_mod_id_numeric(api_key, game_id, mod_slug)
         if numeric_id is not None:
             return numeric_id, None
@@ -356,7 +488,6 @@ def resolve_mod_id_global_search(api_key, game_id, mod_slug):
     for item in items:
         if not isinstance(item, dict):
             continue
-        # Ensure game_id matches
         item_game_id = item.get("game_id")
         if isinstance(item_game_id, int) and item_game_id != game_id:
             continue
@@ -368,7 +499,6 @@ def resolve_mod_id_global_search(api_key, game_id, mod_slug):
 
 
 def resolve_mod_id_numeric(api_key, game_id, mod_slug):
-    # If the slug is numeric, try direct mod ID
     if not isinstance(mod_slug, str) or not mod_slug.isdigit():
         return None, None
     mod_id = int(mod_slug)
@@ -395,7 +525,6 @@ def resolve_mod_id_numeric(api_key, game_id, mod_slug):
 
 def fallback_search_mod_id(api_key, game_id, mod_slug):
     url = f"{API_BASE}/games/{game_id}/mods"
-    # _q is the documented full-text search parameter
     params = {"api_key": api_key, "_q": mod_slug, "limit": 100}
     headers = {"User-Agent": USER_AGENT}
     resp = safe_request("GET", url, params=params, headers=headers, timeout=15)
@@ -507,12 +636,9 @@ def extract_download_info(file_obj):
     binary_url = download.get("binary_url")
     if not isinstance(binary_url, str) or not binary_url.strip():
         return None, None
-    # Fix escaped slashes
     binary_url = binary_url.replace("\\/", "/")
-    # Determine filename
     filename = file_obj.get("filename")
     if not isinstance(filename, str) or not filename.strip():
-        # Try from URL
         try:
             parsed = urlparse(binary_url)
             path = parsed.path or ""
@@ -523,27 +649,46 @@ def extract_download_info(file_obj):
     return binary_url, filename
 
 
-def download_file(url, filename):
+def download_file(url, filename, expected_size=None, allow_existing=True):
     headers = {"User-Agent": USER_AGENT}
-    # Attempt twice max
     for attempt in range(1, 3):
+        try:
+            os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+            if os.path.isabs(filename) or os.path.dirname(filename):
+                target = filename
+            else:
+                target = os.path.join(DOWNLOAD_DIR, filename)
+            if allow_existing and os.path.exists(target):
+                print_info(f"File already exists, skipping: {target}")
+                print_info("Using existing file.")
+                return True, True, target
+            if os.path.exists(target):
+                try:
+                    os.remove(target)
+                except Exception:
+                    pass
+        except Exception as exc:
+            print_error(f"Failed to prepare download path: {exc}")
+            return False, False, ""
+
+        print_status("Downloading...")
         resp = safe_request("GET", url, headers=headers, stream=True, timeout=30)
         if resp is None:
-            print_error("Download failed due to network error.")
+            print_error("Network error occurred.")
             if attempt == 2:
-                return False
+                return False, False, ""
             time.sleep(1)
             continue
         if resp.status_code == 429:
-            print_error("Rate limited (429) during download.")
+            print_error("Rate limited. Try again later.")
             if attempt == 2:
-                return False
+                return False, False, ""
             time.sleep(2)
             continue
         if resp.status_code >= 400:
-            print_error(f"Download failed with status {resp.status_code}.")
+            print_error("Unexpected error occurred.")
             if attempt == 2:
-                return False
+                return False, False, ""
             time.sleep(1)
             continue
 
@@ -554,9 +699,7 @@ def download_file(url, filename):
             total_bytes = None
 
         try:
-            os.makedirs(DOWNLOAD_DIR, exist_ok=True)
-            filename = os.path.join(DOWNLOAD_DIR, filename)
-            with open(filename, "wb") as f:
+            with open(target, "wb") as f:
                 if tqdm is not None and total_bytes is not None:
                     with tqdm(total=total_bytes, unit="B", unit_scale=True, desc="Downloading") as bar:
                         for chunk in resp.iter_content(chunk_size=1024 * 256):
@@ -577,15 +720,423 @@ def download_file(url, filename):
                             if pct >= last_print + 5 or pct == 100:
                                 print(f"Downloading... {pct}%")
                                 last_print = pct
-                    if total_bytes is None:
-                        print_info("Download complete (size unknown).")
-            return True
-        except Exception as exc:
-            print_error(f"Failed to write file: {exc}")
+            if total_bytes is None:
+                print_info("Download complete (size unknown).")
+            if expected_size is not None:
+                try:
+                    actual = os.path.getsize(target)
+                    if actual != expected_size:
+                        try:
+                            os.remove(target)
+                        except Exception:
+                            pass
+                        print_error("Downloaded file size mismatch. Retrying.")
+                        if attempt == 2:
+                            return False, False, ""
+                        time.sleep(1)
+                        continue
+                except Exception:
+                    pass
+            print_status("Download complete.")
+            return True, False, target
+        except Exception:
+            print_error("Unexpected error occurred.")
             if attempt == 2:
-                return False
+                return False, False, ""
             time.sleep(1)
-    return False
+    return False, False, ""
+
+
+def download_mod(url, filename=None, expected_size=None, allow_existing=True):
+    if not isinstance(url, str) or not url.strip():
+        print_error("Download URL is invalid.")
+        return None
+    if not filename:
+        try:
+            parsed = urlparse(url)
+            path = parsed.path or ""
+            base = os.path.basename(path)
+            filename = unquote(base) if base else None
+        except Exception:
+            filename = None
+    if not filename:
+        filename = "modfile.bin"
+    ok, skipped, final_path = download_file(url, filename, expected_size=expected_size, allow_existing=allow_existing)
+    if not ok:
+        return None, False
+    return final_path, skipped
+
+
+def extract_mod(zip_path):
+    if not isinstance(zip_path, str) or not zip_path:
+        print_error("No downloaded file to extract.")
+        return None
+    if not os.path.exists(zip_path):
+        print_error("Downloaded file does not exist.")
+        return None
+    if not zipfile.is_zipfile(zip_path):
+        print_error("Downloaded file is not a ZIP. Extraction skipped.")
+        return None
+    try:
+        extract_path = tempfile.mkdtemp(prefix="modiodirect_extract_")
+        print_status("Extracting...")
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            zf.extractall(extract_path)
+        print_status("Extraction complete.")
+        return extract_path
+    except Exception:
+        print_error("Unexpected error occurred.")
+        return None
+
+
+def normalize_name(value):
+    if not isinstance(value, str):
+        return ""
+    return re.sub(r"[^a-z0-9]+", "", value.lower())
+
+
+def expand_path(value):
+    if not isinstance(value, str):
+        return ""
+    cleaned = value.replace("/", "\\")
+    cleaned = cleaned.replace("{USERNAME}", os.environ.get("USERNAME", ""))
+    cleaned = cleaned.replace("[Manual]", "").strip()
+    cleaned = os.path.expandvars(cleaned)
+    cleaned = os.path.expanduser(cleaned)
+    return cleaned
+
+
+def load_games_db():
+    for path in GAMES_DB_PATHS:
+        try:
+            if os.path.isfile(path):
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if isinstance(data, dict):
+                    return data
+        except Exception:
+            continue
+    return None
+
+
+def get_verified_paths_from_db(game_name):
+    data = load_games_db()
+    if not isinstance(data, dict):
+        return []
+    games = data.get("game_mod_paths")
+    if not isinstance(games, list):
+        return []
+    key = normalize_name(game_name)
+    for item in games:
+        if not isinstance(item, dict):
+            continue
+        name = item.get("name")
+        if isinstance(name, str) and normalize_name(name) == key:
+            paths = []
+            mod_paths = item.get("mod_folder_paths")
+            if isinstance(mod_paths, dict):
+                for _k, v in mod_paths.items():
+                    if isinstance(v, str):
+                        paths.append(v)
+            return paths
+    return []
+
+
+def get_modio_storage_roots():
+    roots = []
+    public_root = os.path.join(os.environ.get("PUBLIC", r"C:\Users\Public"), "mod.io")
+    if os.path.isdir(public_root):
+        roots.append(public_root)
+    local_app = os.environ.get("LOCALAPPDATA", "")
+    if local_app:
+        settings = os.path.join(local_app, "mod.io", "globalsettings.json")
+        try:
+            if os.path.isfile(settings):
+                with open(settings, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if isinstance(data, dict):
+                    root = data.get("RootLocalStoragePath")
+                    if isinstance(root, str) and os.path.isdir(root):
+                        roots.append(root)
+        except Exception:
+            pass
+    seen = set()
+    unique = []
+    for r in roots:
+        key = r.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(r)
+    return unique
+
+
+def detect_mod_folders(game_name, game_id):
+    verified = get_verified_paths_from_db(game_name)
+    verified_candidates = []
+    for p in verified:
+        full = expand_path(p)
+        if full:
+            verified_candidates.append((f"{game_name} - Verified", full))
+    if verified_candidates:
+        return verified_candidates
+
+    roots = []
+    steam_root = r"C:\Program Files (x86)\Steam\steamapps\common"
+    epic_root = r"C:\Program Files\Epic Games"
+    if os.path.isdir(steam_root):
+        roots.append(steam_root)
+    if os.path.isdir(epic_root):
+        roots.append(epic_root)
+
+    candidates = []
+    mod_dir_names = {"mods", "mod", "paks"}
+    game_key = normalize_name(game_name)
+    for root in roots:
+        for base, dirs, _files in os.walk(root):
+            rel = os.path.relpath(base, root)
+            depth = rel.count(os.sep) if rel != "." else 0
+            if depth > 3:
+                dirs[:] = []
+                continue
+
+            lower_base = base.lower()
+            if lower_base.endswith(os.path.join("bepinex", "plugins")):
+                found_game = os.path.basename(os.path.dirname(os.path.dirname(base)))
+                if game_key and normalize_name(found_game) != game_key:
+                    continue
+                label = f"{found_game} - BepInEx/plugins"
+                candidates.append((label, base))
+
+            for d in list(dirs):
+                if d.lower() in mod_dir_names:
+                    full = os.path.join(base, d)
+                    found_game = os.path.basename(base)
+                    if game_key and normalize_name(found_game) != game_key:
+                        continue
+                    label = f"{found_game} - {d}"
+                    candidates.append((label, full))
+
+    if isinstance(game_id, int):
+        gid = str(game_id)
+        for root in get_modio_storage_roots():
+            try:
+                for base, dirs, _files in os.walk(root):
+                    rel = os.path.relpath(base, root)
+                    depth = rel.count(os.sep) if rel != "." else 0
+                    if depth > 2:
+                        dirs[:] = []
+                        continue
+                    for d in list(dirs):
+                        if d == gid:
+                            path = os.path.join(base, d)
+                            label = f"mod.io storage (game_id {gid})"
+                            candidates.append((label, path))
+            except Exception:
+                continue
+    seen = set()
+    unique = []
+    for label, path in candidates:
+        key = path.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append((label, path))
+    return unique
+
+
+def install_mod(zip_path, target_path, force=False):
+    if not zip_path or not os.path.isfile(zip_path):
+        print_error("Downloaded mod file is invalid.")
+        return False
+    if not target_path:
+        print_error("Target install path is invalid.")
+        return False
+    if not os.path.isdir(target_path):
+        try:
+            os.makedirs(target_path, exist_ok=True)
+        except Exception:
+            print_error("Target install path is invalid.")
+            return False
+    extracted_path = ""
+    try:
+        base_name = os.path.splitext(os.path.basename(zip_path))[0]
+        existing_dir = os.path.join(target_path, base_name)
+        if os.path.isdir(existing_dir) and os.listdir(existing_dir) and not force:
+            print_info("Up to date — nothing to do.")
+            return True
+        extracted_path = extract_mod(zip_path)
+        if not extracted_path:
+            print_error("Install skipped (extraction failed).")
+            return False
+        print_status("Installing...")
+        for name in os.listdir(extracted_path):
+            src = os.path.join(extracted_path, name)
+            dst = os.path.join(target_path, name)
+            if os.path.isdir(src):
+                shutil.copytree(src, dst, dirs_exist_ok=True)
+            else:
+                shutil.copy2(src, dst)
+        print_status("Install complete.")
+        print_info(f"Mod installed successfully: {target_path}")
+        return True
+    except Exception:
+        print_error("Unexpected error occurred.")
+        return False
+    finally:
+        if extracted_path and os.path.isdir(extracted_path):
+            shutil.rmtree(extracted_path, ignore_errors=True)
+
+
+def process_single_mod(api_key, game_slug, mod_slug, install_requested, force_requested, cache):
+    if not game_slug or not mod_slug:
+        print_error("Missing game or mod slug.")
+        return False, None, "", None, None, False, False
+
+    game_id, err = resolve_game_id(api_key, game_slug)
+    if err:
+        print_error(friendly_error(err))
+        return False, None, "", None, None, False, False
+    game_details, gerr = fetch_game_details(api_key, game_id)
+    if gerr:
+        print_error(friendly_error(gerr))
+        return False, None, "", game_id, None, False, False
+    game_name = ""
+    if isinstance(game_details, dict):
+        name = game_details.get("name")
+        if isinstance(name, str):
+            game_name = name
+    if game_name:
+        print_info(f"Game : {game_name}")
+
+    mod_id, err = resolve_mod_id(api_key, game_id, mod_slug)
+    if err:
+        print_error(friendly_error(err))
+        return False, None, game_name, game_id, None, False, False
+    mod_details, merr = fetch_mod_details(api_key, game_id, mod_id)
+    if merr:
+        print_error(friendly_error(merr))
+        return False, None, game_name, game_id, None, False, False
+
+    mod_name = ""
+    if isinstance(mod_details, dict):
+        name = mod_details.get("name")
+        if isinstance(name, str):
+            mod_name = name
+
+    if mod_name:
+        print_info(f"Mod  : {mod_name}")
+
+    files, err = fetch_mod_files(api_key, game_id, mod_id)
+    if err:
+        print_error(friendly_error(err))
+        return False, None, game_name, game_id, None, False, False
+
+    latest_file = select_latest_file(files)
+    if latest_file is None:
+        print_error("Could not determine latest mod file.")
+        return False, None, game_name, game_id, None, False, False
+
+    binary_url, filename = extract_download_info(latest_file)
+    if not binary_url:
+        print_error("No valid download URL found in mod file.")
+        return False, None, game_name, game_id, None, False, False
+
+    latest_version_id = latest_file.get("id") if isinstance(latest_file, dict) else None
+    latest_version_number = latest_file.get("version") if isinstance(latest_file, dict) else None
+    expected_size = get_expected_size(latest_file)
+
+    print_info(f"Latest file: {filename}")
+    cache_mods = cache.get("mods", {}) if isinstance(cache, dict) else {}
+    entry = cache_mods.get(str(mod_id)) if isinstance(cache_mods, dict) else None
+    existing_path = os.path.join(DOWNLOAD_DIR, filename) if filename else ""
+
+    downloaded_path = None
+    skipped = False
+    install_skip = False
+    if entry and entry.get("latest_version_id") == latest_version_id and not force_requested:
+        if install_requested:
+            installed_id = entry.get("installed_version_id")
+            installed_path = entry.get("installed_path")
+            if installed_id == latest_version_id and isinstance(installed_path, str) and os.path.isdir(installed_path):
+                print_info("Up to date — nothing to do.")
+                install_skip = True
+                return True, "", game_name, game_id, mod_id, True, install_skip
+        if os.path.isfile(existing_path):
+            if expected_size is None or os.path.getsize(existing_path) == expected_size:
+                print_info("Already latest version. Skipping download.")
+                downloaded_path = existing_path
+                skipped = True
+
+    if downloaded_path is None:
+        if not install_requested and os.path.isfile(existing_path) and not force_requested:
+            if expected_size is None or os.path.getsize(existing_path) == expected_size:
+                print_info("Already downloaded. Using existing file.")
+                downloaded_path, skipped = existing_path, True
+        if downloaded_path is not None:
+            pass
+        if install_requested:
+            if os.path.isfile(existing_path) and (expected_size is None or os.path.getsize(existing_path) == expected_size) and not force_requested:
+                print_info(f"File already exists, skipping: {existing_path}")
+                downloaded_path, skipped = existing_path, True
+            else:
+                if filename:
+                    temp_dir = tempfile.mkdtemp(prefix="modiodirect_")
+                    temp_path = os.path.join(temp_dir, filename)
+                    result = download_mod(
+                        binary_url,
+                        temp_path,
+                        expected_size=expected_size,
+                        allow_existing=False,
+                    )
+                    if result:
+                        downloaded_path, skipped = result
+        else:
+            if downloaded_path is None:
+                result = download_mod(
+                    binary_url,
+                    filename,
+                    expected_size=expected_size,
+                    allow_existing=True,
+                )
+                if result is not None:
+                    downloaded_path, skipped = result
+
+    ok = downloaded_path is not None
+    if ok:
+        if not skipped and not install_requested:
+            if filename:
+                print_info(f"Saved as: {os.path.join(DOWNLOAD_DIR, filename)}")
+        try:
+            os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+            info_path = os.path.join(DOWNLOAD_DIR, "modinfo.json")
+            info = {
+                "game_name": game_name,
+                "mod_name": mod_name,
+                "mod_id": mod_id,
+                "file_id": latest_version_id,
+                "date_downloaded": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            }
+            with open(info_path, "w", encoding="utf-8") as f:
+                json.dump(info, f, indent=2)
+        except Exception:
+            print_error("Unexpected error occurred.")
+        if isinstance(cache, dict):
+            cache.setdefault("mods", {})
+            cache["mods"][str(mod_id)] = {
+                "mod_id": mod_id,
+                "mod_name": mod_name,
+                "latest_version_id": latest_version_id,
+                "latest_version_number": latest_version_number,
+                "file_name": filename,
+                "file_size": expected_size,
+                "download_date": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            }
+            save_cache(cache)
+        return True, downloaded_path, game_name, game_id, mod_id, skipped, install_skip
+
+    print_error("Download failed after retry.")
+    return False, None, game_name, game_id, mod_id, False, install_skip
 
 
 def main():
@@ -594,102 +1145,166 @@ def main():
         print_error("Cannot continue without 'requests'.")
         return
 
+    parser = argparse.ArgumentParser(
+        description="ModioDirect - crash-proof mod.io downloader",
+        epilog=(
+            "Examples:\n"
+            "  python ModioDirect.py https://mod.io/g/spaceengineers/m/assault-weapons-pack1\n"
+            "  python ModioDirect.py https://mod.io/g/spaceengineers/m/assault-weapons-pack1 --install\n"
+            "  python ModioDirect.py --no-config\n"
+            "Tip: Paste a URL at the prompt, or type file:C:\\path\\to\\mods.txt for batch."
+        ),
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    parser.add_argument("mod_url", nargs="?", help="mod.io mod URL")
+    parser.add_argument("--install", action="store_true", help="Install mod to detected game folder (opt-in)")
+    parser.add_argument("--no-config", action="store_true", help="Do not save API key to config.json")
+    parser.add_argument("--no-pause", action="store_true", help="Do not pause on exit")
+    parser.add_argument("--debug", action="store_true", help="Show technical errors")
+    parser.add_argument("--force", action="store_true", help="Reinstall regardless of version")
+    args, _unknown = parser.parse_known_args()
+    global DEBUG
+    DEBUG = args.debug
+
     config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), CONFIG_NAME)
-    use_config = "--no-config" not in sys.argv
+    use_config = not args.no_config
     api_key = prompt_api_key(config_path, use_config)
+    cache = load_cache()
 
     while True:
-        game_slug, mod_slug = prompt_mod_url()
+        if args.mod_url:
+            game_slug, mod_slug = parse_modio_url(args.mod_url)
+            install_requested = args.install
+            force_requested = args.force
+            if not game_slug or not mod_slug:
+                print_error("Invalid mod URL.")
+                return
+        else:
+            game_slug, mod_slug, install_requested, force_requested = prompt_mod_url()
         if game_slug is None and mod_slug is None:
             print_info("Thanks for using ModioDirect.")
+            print_info("Check GitHub for more: https://github.com/Therootexec/ModioDirect")
             return
-
-        game_id, err = resolve_game_id(api_key, game_slug)
-        if err:
-            print_error(err)
-            continue
-        game_details, gerr = fetch_game_details(api_key, game_id)
-        if gerr:
-            print_error(gerr)
-            continue
-        # Surface the resolved game name early
-        game_name = ""
-        if isinstance(game_details, dict):
-            name = game_details.get("name")
-            if isinstance(name, str):
-                game_name = name
-        if game_name:
-            print_info(f"Game : {game_name}")
-
-        mod_id, err = resolve_mod_id(api_key, game_id, mod_slug)
-        if err:
-            print_error(err)
-            continue
-        mod_details, merr = fetch_mod_details(api_key, game_id, mod_id)
-        if merr:
-            print_error(merr)
-            continue
-
-        mod_name = ""
-        if isinstance(mod_details, dict):
-            name = mod_details.get("name")
-            if isinstance(name, str):
-                mod_name = name
-
-        if mod_name:
-            print_info(f"Mod  : {mod_name}")
-
-        files, err = fetch_mod_files(api_key, game_id, mod_id)
-        if err:
-            print_error(err)
-            continue
-
-        latest_file = select_latest_file(files)
-        if latest_file is None:
-            print_error("Could not determine latest mod file.")
-            continue
-
-        binary_url, filename = extract_download_info(latest_file)
-        if not binary_url:
-            print_error("No valid download URL found in mod file.")
-            continue
-
-        print_info(f"Latest file: {filename}")
-        ok = download_file(binary_url, filename)
-        if ok:
-            print_info(f"Saved as: {filename}")
-            # Optional JSON export
-            try:
-                os.makedirs(DOWNLOAD_DIR, exist_ok=True)
-                info_path = os.path.join(DOWNLOAD_DIR, "modinfo.json")
-                info = {
-                    "game_name": game_name,
-                    "mod_name": mod_name,
-                    "mod_id": mod_id,
-                    "file_id": latest_file.get("id") if isinstance(latest_file, dict) else None,
-                    "date_downloaded": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                }
-                with open(info_path, "w", encoding="utf-8") as f:
-                    json.dump(info, f, indent=2)
-            except Exception as exc:
-                print_error(f"Failed to write modinfo.json: {exc}")
+        if game_slug == "BATCH_FILE":
+            urls = load_batch_urls(mod_slug)
+            if not urls:
+                print_error("Batch file is empty or unreadable.")
+                continue
+            print_info(f"Batch mode: {len(urls)} URL(s)")
+            batch_target = None
+            if install_requested:
+                first_valid = None
+                for raw_url in urls:
+                    gs, ms = parse_modio_url(raw_url)
+                    if gs and ms:
+                        first_valid = (gs, ms)
+                        break
+                if first_valid:
+                    gs, ms = first_valid
+                    gid, err = resolve_game_id(api_key, gs)
+                    if err:
+                        print_error(friendly_error(err))
+                        install_requested = False
+                    else:
+                        gdetails, gerr = fetch_game_details(api_key, gid)
+                        gname = ""
+                        if not gerr and isinstance(gdetails, dict):
+                            name = gdetails.get("name")
+                            if isinstance(name, str):
+                                gname = name
+                        candidates = detect_mod_folders(gname, gid)
+                        if not candidates:
+                            print_error("Mod folder not found. Install skipped.")
+                            install_requested = False
+                        else:
+                            print("Select install location:")
+                            for idx, (label, path) in enumerate(candidates, start=1):
+                                print(f"[{idx}] {label} -> {path}")
+                            print(f"[{len(candidates)+1}] Skip install")
+                            choice = input("Choose a number (or 'q' to cancel): ").strip()
+                            if choice.lower() in ("q", "quit", "exit", "back"):
+                                print_info("Install skipped.")
+                                install_requested = False
+                                batch_target = None
+                                choice = ""
+                            try:
+                                num = int(choice)
+                            except Exception:
+                                num = -1
+                            if num == len(candidates) + 1:
+                                print_info("Install skipped.")
+                                install_requested = False
+                            elif 1 <= num <= len(candidates):
+                                _label, target = candidates[num - 1]
+                                batch_target = target
+                            else:
+                                print_error("Invalid choice.")
+                                install_requested = False
+            completed = 0
+            for raw_url in urls:
+                gs, ms = parse_modio_url(raw_url)
+                if not gs or not ms:
+                    print_error(f"Invalid URL in batch file: {raw_url}")
+                    continue
+                print_info(f"Processing: {raw_url}")
+                ok, downloaded_path, game_name, game_id, mod_id, _skipped, install_skip = process_single_mod(api_key, gs, ms, install_requested, force_requested, cache)
+                if ok and install_requested and batch_target and not install_skip:
+                    if install_mod(downloaded_path, batch_target, force=force_requested):
+                        if isinstance(cache, dict) and mod_id is not None:
+                            cache.setdefault("mods", {})
+                            entry = cache["mods"].get(str(mod_id), {})
+                            entry["installed_version_id"] = entry.get("latest_version_id")
+                            entry["installed_path"] = batch_target
+                            cache["mods"][str(mod_id)] = entry
+                            save_cache(cache)
+                    cleanup_temp_file(downloaded_path)
+                if ok:
+                    completed += 1
+            print_info(f"Batch complete: {completed}/{len(urls)} successful.")
         else:
-            print_error("Download failed after retry.")
+            ok, downloaded_path, game_name, game_id, mod_id, _skipped, install_skip = process_single_mod(api_key, game_slug, mod_slug, install_requested, force_requested, cache)
+            if ok and install_requested and not install_skip:
+                candidates = detect_mod_folders(game_name, game_id)
+                if not candidates:
+                    print_error("Mod folder not found. Install skipped.")
+                else:
+                    print("Select install location:")
+                    for idx, (label, path) in enumerate(candidates, start=1):
+                        print(f"[{idx}] {label} -> {path}")
+                    print(f"[{len(candidates)+1}] Skip install")
+                    choice = input("Choose a number (or 'q' to cancel): ").strip()
+                    if choice.lower() in ("q", "quit", "exit", "back"):
+                        print_info("Install skipped.")
+                        choice = ""
+                    try:
+                        num = int(choice)
+                    except Exception:
+                        num = -1
+                    if num == len(candidates) + 1:
+                        print_info("Install skipped.")
+                    elif 1 <= num <= len(candidates):
+                        _label, target = candidates[num - 1]
+                        if install_mod(downloaded_path, target, force=force_requested):
+                            if isinstance(cache, dict) and mod_id is not None:
+                                cache.setdefault("mods", {})
+                                entry = cache["mods"].get(str(mod_id), {})
+                                entry["installed_version_id"] = entry.get("latest_version_id")
+                                entry["installed_path"] = target
+                                cache["mods"][str(mod_id)] = entry
+                                save_cache(cache)
+                        cleanup_temp_file(downloaded_path)
+                    else:
+                        print_error("Invalid choice.")
 
-        # Ask if user wants another
-        again = input("Download another mod? (y/n): ").strip().lower()
-        if again != "y":
-            print_info("Thanks for using ModioDirect.")
+        if args.mod_url:
             return
 
 
 def maybe_pause_on_exit():
-    # Help Windows users who double-click the .py (console closes immediately).
     if os.name != "nt":
         return
     if "--no-pause" in sys.argv:
         return
-    # Only pause for direct script runs without extra args.
     if len(sys.argv) > 1:
         return
     try:
@@ -703,29 +1318,13 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print_error("Interrupted by user.")
-    except Exception as exc:
-        print_error(f"Unexpected error: {exc}")
+    except Exception:
+        print_error("Unexpected error occurred.")
+        if DEBUG:
+            try:
+                traceback.print_exc()
+            except Exception:
+                pass
     finally:
         maybe_pause_on_exit()
 
-"""
-Simulated full run (example):
-
-ModioDirect - mod.io downloader
-Enter your mod.io API key: 12345INVALID
-[Error] Invalid API key (401 Unauthorized).
-Enter your mod.io API key: 67890VALID
-[Info] API key validated.
-Enter mod.io mod URL: https://mod.io/g/spaceengineers/m/assault-weapons-pack1
-[Info] Game : Space Engineers
-[Info] Mod  : Assault Weapons Pack
-[Info] Latest file: assault_weapons_pack1.zip
-Downloading... 5%
-Downloading... 10%
-...
-Downloading... 100%
-[Info] Saved as: assault_weapons_pack1.zip
-Download another mod? (y/n): n
-[Info] Exiting.
-
-"""
