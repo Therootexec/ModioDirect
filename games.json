@@ -1,0 +1,328 @@
+{
+  "metadata": {
+    "generated": "2026-02-18",
+    "source": "Compiled from official documentation, mod.io support, and game wikis",
+    "notes": "Paths use {USERNAME} placeholder. [Manual] indicates user-created folder needed."
+  },
+  "game_mod_paths": [
+    {
+      "id": 1,
+      "name": "0 A.D.",
+      "modio_url": "https://mod.io/g/0ad",
+      "mod_folder_paths": {
+        "windows": "%APPDATA%/0ad/mods/",
+        "linux": "~/.config/0ad/mods/",
+        "mac": "~/Library/Application Support/0ad/mods/"
+      },
+      "notes": "Configuration subfolders may be required"
+    },
+    {
+      "id": 2,
+      "name": "Anno 1800",
+      "modio_url": "https://mod.io/g/anno-1800",
+      "mod_folder_paths": {
+        "windows": "C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\games\\Anno 1800\\mods\\ [Manual]",
+        "alternative": "%USERPROFILE%\\Documents\\Anno 1800\\mods\\ [Manual]"
+      },
+      "notes": "Must create 'mods' folder manually. Some mods require specific subfolder structures [citation:6]"
+    },
+    {
+      "id": 3,
+      "name": "Anno 117: Pax Romana",
+      "modio_url": "https://mod.io/g/anno-117",
+      "mod_folder_paths": {
+        "windows": "C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\games\\Anno 117\\mods\\ [Manual]",
+        "alternative": "%USERPROFILE%\\Documents\\Anno 117\\mods\\ [Manual]"
+      },
+      "notes": "Following Anno 1800 pattern. Create 'mods' folder in game root or Documents"
+    },
+    {
+      "id": 4,
+      "name": "Baldur's Gate 3",
+      "modio_url": "https://mod.io/g/baldurs-gate-3",
+      "mod_folder_paths": {
+        "windows": "%LOCALAPPDATA%\\Larian Studios\\Baldur's Gate 3\\Mods\\",
+        "mac": "~/Library/Application Support/Larian Studios/Baldur's Gate 3/Mods/"
+      },
+      "notes": "Mods folder created automatically by the game"
+    },
+    {
+      "id": 5,
+      "name": "Besiege",
+      "modio_url": "https://mod.io/g/besiege",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\Documents\\Besiege\\Mods\\"
+      },
+      "notes": "Mods folder created by the game"
+    },
+    {
+      "id": 6,
+      "name": "Blade And Sorcery",
+      "modio_url": "https://mod.io/g/blade-and-sorcery",
+      "mod_folder_paths": {
+        "windows": "Steam\\steamapps\\common\\BladeAndSorcery\\BladeAndSorcery_Data\\StreamingAssets\\Mods\\"
+      },
+      "notes": "Standard installation path inside game folder"
+    },
+    {
+      "id": 7,
+      "name": "Bonelab",
+      "modio_url": "https://mod.io/g/bonelab",
+      "mod_folder_paths": {
+        "windows": "%LOCALAPPDATA%\\Stress Level Zero\\BONELAB\\Mods\\",
+        "oculus": "Oculus Apps\\Bonelab\\Mods\\"
+      },
+      "notes": "AppData folder is hidden by default"
+    },
+    {
+      "id": 8,
+      "name": "Core Keeper",
+      "modio_url": "https://mod.io/g/core-keeper",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\AppData\\LocalLow\\Core Keeper\\Mods\\"
+      },
+      "notes": "Mods folder created by the game"
+    },
+    {
+      "id": 9,
+      "name": "Deep Rock Galactic",
+      "modio_url": "https://mod.io/g/deep-rock-galactic",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\AppData\\Local\\DeepRockGalactic\\ModHub\\Mods\\"
+      },
+      "notes": "Integrated mod.io support, but manual installs go here"
+    },
+    {
+      "id": 10,
+      "name": "Descenders",
+      "modio_url": "https://mod.io/g/descenders",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\AppData\\LocalLow\\Descenders\\Mods\\"
+      }
+    },
+    {
+      "id": 11,
+      "name": "Dying Light 2",
+      "modio_url": "https://mod.io/g/dying-light-2",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\Documents\\Dying Light 2\\out\\save\\mods\\ [Manual]"
+      },
+      "notes": "Create 'mods' folder manually. Requires specific file structure"
+    },
+    {
+      "id": 12,
+      "name": "ECO",
+      "modio_url": "https://mod.io/g/eco",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\Documents\\Eco\\Mods\\UserCode\\",
+        "server": "Server\\Mods\\UserCode\\ [Manual]"
+      },
+      "notes": "Server mods go in server folder, client mods in Documents [citation:9]"
+    },
+    {
+      "id": 13,
+      "name": "Expeditions: A MudRunner Game",
+      "modio_url": "https://mod.io/g/expeditions",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\Documents\\My Games\\Expeditions\\base\\Mods\\.modio\\mods\\"
+      },
+      "notes": "mod.io downloaded mods use this structure"
+    },
+    {
+      "id": 14,
+      "name": "Foundation",
+      "modio_url": "https://mod.io/g/foundation",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\Documents\\Foundation\\mods\\"
+      }
+    },
+    {
+      "id": 15,
+      "name": "Gloomhaven",
+      "modio_url": "https://mod.io/g/gloomhaven",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\AppData\\LocalLow\\Gloomhaven\\Mods\\"
+      }
+    },
+    {
+      "id": 16,
+      "name": "Grounded",
+      "modio_url": "https://mod.io/g/grounded",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\AppData\\Local\\Grounded\\Mods\\ [Manual]"
+      },
+      "notes": "Requires manual mod folder creation"
+    },
+    {
+      "id": 17,
+      "name": "House Flipper 2",
+      "modio_url": "https://mod.io/g/house-flipper-2",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\AppData\\Local\\HouseFlipper2\\Mods\\"
+      }
+    },
+    {
+      "id": 18,
+      "name": "Humankind",
+      "modio_url": "https://mod.io/g/humankind",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\Documents\\Humankind\\Mods\\"
+      }
+    },
+    {
+      "id": 19,
+      "name": "Melvor Idle",
+      "modio_url": "https://mod.io/g/melvor-idle",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\AppData\\Local\\Melvor Idle\\mods\\",
+        "steam": "Steam\\steamapps\\common\\Melvor Idle\\resources\\app\\mods\\ [Manual]"
+      },
+      "notes": "manifest.json required at mod root [citation:5]"
+    },
+    {
+      "id": 20,
+      "name": "MORDHAU",
+      "modio_url": "https://mod.io/g/mordhau",
+      "mod_folder_paths": {
+        "windows": "Steam\\steamapps\\common\\Mordhau\\Mordhau\\Content\\Paks\\mods\\ [Manual]"
+      },
+      "notes": "Manual mod folder creation required"
+    },
+    {
+      "id": 21,
+      "name": "Pavlov VR",
+      "modio_url": "https://mod.io/g/pavlov-vr",
+      "mod_folder_paths": {
+        "windows": "Configured in %LOCALAPPDATA%\\Pavlov\\Saved\\Config\\Windows\\GameUserSettings.ini"
+      },
+      "notes": "User must set 'ModDirectory=' path manually in config file [citation:2]"
+    },
+    {
+      "id": 22,
+      "name": "Ready or Not",
+      "modio_url": "https://mod.io/g/ready-or-not",
+      "mod_folder_paths": {
+        "windows": "%LOCALAPPDATA%\\ReadyOrNot\\Saved\\Mods\\"
+      }
+    },
+    {
+      "id": 23,
+      "name": "Satisfactory",
+      "modio_url": "https://mod.io/g/satisfactory",
+      "mod_folder_paths": {
+        "windows": "%LOCALAPPDATA%\\FactoryGame\\Saved\\Mods\\"
+      }
+    },
+    {
+      "id": 24,
+      "name": "Sins of a Solar Empire II",
+      "modio_url": "https://mod.io/g/sins2",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\Documents\\My Games\\Sins of a Solar Empire II\\Mods\\"
+      }
+    },
+    {
+      "id": 25,
+      "name": "SnowRunner",
+      "modio_url": "https://mod.io/g/snowrunner",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\Documents\\My Games\\SnowRunner\\base\\Mods\\.modio\\mods\\"
+      },
+      "notes": "mod.io downloaded mods install to .modio subfolder"
+    },
+    {
+      "id": 26,
+      "name": "Space Engineers",
+      "modio_url": "https://mod.io/g/space-engineers",
+      "mod_folder_paths": {
+        "windows": "%APPDATA%\\SpaceEngineers\\Mods\\"
+      }
+    },
+    {
+      "id": 27,
+      "name": "S.T.A.L.K.E.R. 2",
+      "modio_url": "https://mod.io/g/stalker-2",
+      "mod_folder_paths": {
+        "windows": "Steam\\steamapps\\common\\S.T.A.L.K.E.R. 2 Heart of Chornobyl\\mods\\ [Manual]"
+      },
+      "notes": "Create 'mods' folder manually in game root"
+    },
+    {
+      "id": 28,
+      "name": "Tabletop Playground",
+      "modio_url": "https://mod.io/g/tabletop-playground",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\Documents\\My Games\\Tabletop Playground\\Mods\\"
+      }
+    },
+    {
+      "id": 29,
+      "name": "Timberborn",
+      "modio_url": "https://mod.io/g/timberborn",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\AppData\\LocalLow\\Timberborn\\Mods\\"
+      }
+    },
+    {
+      "id": 30,
+      "name": "Totally Accurate Battle Simulator",
+      "modio_url": "https://mod.io/g/tabs",
+      "mod_folder_paths": {
+        "windows": "Steam\\steamapps\\common\\Totally Accurate Battle Simulator\\TotallyAccurateBattleSimulator_Data\\CustomContent\\"
+      },
+      "notes": "Unit mods go in CustomContent folder"
+    },
+    {
+      "id": 31,
+      "name": "Transport Fever 2",
+      "modio_url": "https://mod.io/g/transport-fever-2",
+      "mod_folder_paths": {
+        "windows": "Steam\\steamapps\\common\\Transport Fever 2\\mods\\"
+      },
+      "notes": "Requires specific folder structure with mod.lua and config files [citation:3]"
+    },
+    {
+      "id": 32,
+      "name": "Tropico 6",
+      "modio_url": "https://mod.io/g/tropico-6",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\Documents\\My Games\\Tropico 6\\mods\\"
+      }
+    },
+    {
+      "id": 33,
+      "name": "Two Point Campus",
+      "modio_url": "https://mod.io/g/two-point-campus",
+      "mod_folder_paths": {
+        "windows": "%LOCALAPPDATA%\\TwoPointCampus\\Mods\\"
+      }
+    },
+    {
+      "id": 34,
+      "name": "Warhammer 40k: Battlesector",
+      "modio_url": "https://mod.io/g/warhammer-40k-battlesector",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\AppData\\LocalLow\\Warhammer 40k Battlesector\\Mods\\"
+      }
+    },
+    {
+      "id": 35,
+      "name": "Zeepkist",
+      "modio_url": "https://mod.io/g/zeepkist",
+      "mod_folder_paths": {
+        "windows": "%USERPROFILE%\\AppData\\Local\\Zeepkist\\Saved\\Mods\\"
+      }
+    }
+  ],
+  "common_locations": {
+    "steam_default": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\[GAME_NAME]\\",
+    "documents": "%USERPROFILE%\\Documents\\My Games\\[GAME_NAME]\\",
+    "appdata_local": "%LOCALAPPDATA%\\[GAME_NAME]\\",
+    "appdata_locallow": "%USERPROFILE%\\AppData\\LocalLow\\[GAME_NAME]\\",
+    "appdata_roaming": "%APPDATA%\\[GAME_NAME]\\"
+  },
+  "global_modio_settings": {
+    "config_file": "%LOCALAPPDATA%\\mod.io\\globalsettings.json",
+    "description": "Edit RootLocalStoragePath to change default mod download location for supported games [citation:2]"
+  }
+}
