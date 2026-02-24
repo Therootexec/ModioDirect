@@ -24,6 +24,15 @@ Supports games like Space Engineers, SnowRunner, and more.
 - Python 3.9+
 - `pip install requests tqdm`
 
+## Install From PyPI
+```bash
+pip install modiodirect
+```
+Run:
+```bash
+modiodirect
+```
+
 ## How To Use It
 ```bash
 python modiodirect.py 
