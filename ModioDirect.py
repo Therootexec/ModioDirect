@@ -872,11 +872,13 @@ def get_modio_storage_roots():
 
 
 def detect_mod_folders(game_name, game_id):
+    if os.name != "nt":
+        return []
     verified = get_verified_paths_from_db(game_name)
     verified_candidates = []
     for p in verified:
         full = expand_path(p)
-        if full:
+        if full and os.path.isdir(full):
             verified_candidates.append((f"{game_name} - Verified", full))
     if verified_candidates:
         return verified_candidates
@@ -914,8 +916,9 @@ def detect_mod_folders(game_name, game_id):
                     found_game = os.path.basename(base)
                     if game_key and normalize_name(found_game) != game_key:
                         continue
-                    label = f"{found_game} - {d}"
-                    candidates.append((label, full))
+                    if os.path.isdir(full):
+                        label = f"{found_game} - {d}"
+                        candidates.append((label, full))
 
     if isinstance(game_id, int):
         gid = str(game_id)
@@ -930,8 +933,9 @@ def detect_mod_folders(game_name, game_id):
                     for d in list(dirs):
                         if d == gid:
                             path = os.path.join(base, d)
-                            label = f"mod.io storage (game_id {gid})"
-                            candidates.append((label, path))
+                            if os.path.isdir(path):
+                                label = f"mod.io storage (game_id {gid})"
+                                candidates.append((label, path))
             except Exception:
                 continue
     seen = set()
@@ -953,11 +957,8 @@ def install_mod(zip_path, target_path, force=False):
         print_error("Target install path is invalid.")
         return False
     if not os.path.isdir(target_path):
-        try:
-            os.makedirs(target_path, exist_ok=True)
-        except Exception:
-            print_error("Target install path is invalid.")
-            return False
+        print_error("Target install path is invalid.")
+        return False
     extracted_path = ""
     try:
         base_name = os.path.splitext(os.path.basename(zip_path))[0]
@@ -1327,4 +1328,3 @@ if __name__ == "__main__":
                 pass
     finally:
         maybe_pause_on_exit()
-
