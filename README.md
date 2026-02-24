@@ -17,6 +17,8 @@ Supports games like Space Engineers, SnowRunner, and more.
 - Progress bar (tqdm optional)
 - Works on Windows & Linux
 - Optional `--no-config` for shared machines
+- Batch mode support
+- Optional auto‑install on Windows (opt‑in)
 
 ## Requirements
 - Python 3.9+
@@ -24,7 +26,7 @@ Supports games like Space Engineers, SnowRunner, and more.
 
 ## How To Use It
 ```bash
-python modiodirect.py OR double click the modiodirect.py
+python modiodirect.py 
 ```
 ## Add Your Mod.io API Key E.g 
 ```bash
@@ -41,7 +43,8 @@ Paste a URL like:
 ```
 https://mod.io/g/GAME/m/example-mod
 ```
-Install directly to a detected game mod folder (optional): 
+## Auto‑Install (Windows Only)
+   Install directly to a detected game mod folder (optional):
 
 ```bash
 python ModioDirect.py <mod_url> --install
