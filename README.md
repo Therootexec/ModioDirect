@@ -81,6 +81,9 @@ This tool is not affiliated with, endorsed by, or officially supported by mod.io
 Some games/mods are private, unlisted, or require OAuth access. In those cases, the mod.io API returns 404 even if the URL exists. This is an access restriction, not a bug in ModioDirect.
 
 If you see:
+```
+[Error] Game not accessible (404). The game may be private, unpublished, or require OAuth access.
+```
 <img width="1093" height="309" alt="Screenshot 2026-02-06 170047" src="https://github.com/user-attachments/assets/eb1148df-ef85-468f-a21b-d99cd26901db" />
 
 
