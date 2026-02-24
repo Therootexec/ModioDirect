@@ -49,7 +49,7 @@ python ModioDirect.py <mod_url> --install
 
 This will scan common Steam/Epic install locations and let you pick a mod folder.
 
-## Batch Download (Simple)
+## Batch Download (Simple)  (ON HOLD)
 1. Create a text file (example: `mods.txt`)
 2. Put one mod.io URL per line
 3. In the app, type:
