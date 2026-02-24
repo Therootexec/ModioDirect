@@ -19,6 +19,7 @@ Supports games like Space Engineers, SnowRunner, and more.
 - Optional `--no-config` for shared machines
 - Batch mode support
 - Optional auto‑install on Windows (opt‑in)
+- Released on PyPI
 
 ## Requirements
 - Python 3.9+
