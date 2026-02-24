@@ -41,6 +41,28 @@ Paste a URL like:
 ```
 https://mod.io/g/GAME/m/example-mod
 ```
+Install directly to a detected game mod folder (optional): (ON HOLD)
+
+```bash
+python ModioDirect.py <mod_url> --install
+```
+
+This will scan common Steam/Epic install locations and let you pick a mod folder.
+
+## Batch Download (Simple)
+1. Create a text file (example: `mods.txt`)
+2. Put one mod.io URL per line
+3. In the app, type:
+
+```
+file:C:\path\to\mods.txt
+```
+
+Example file:
+
+```
+https://mod.io/g/spaceengineers/m/assault-weapons-pack1
+https://mod.io/g/frenzy-vr/m/black-ops-ray-gun
 ## :exclamation: Security Notice:
    Your mod.io API key is private. Never share it or post it publicly.
    ModioDirect stores the key locally and only uses it to communicate
