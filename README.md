@@ -1,7 +1,7 @@
 # ModioDirect v1.0.1 ![Python](https://img.shields.io/badge/python-3.9%2B-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 **ModioDirect is a lightweight, single-file CLI that reliably downloads mods straight from mod.io via the official API—safe, fast, and free for use. It also allows manual downloads using an API key, bypassing the official game client.
-Supports games like Space Engineers, SnowRunner, and more.
+Supports games like Space Engineers, SnowRunner, Deep Rock Galactic and more.
 
 ![ModioDirectLogo1024x1024](https://github.com/user-attachments/assets/fc2687a6-61f1-42fb-bad2-57fa0df6fc73)
 
