@@ -117,4 +117,4 @@ Thanks to [@Diversion-CTF](https://github.com/Diversion-CTF) For helping with th
 
 ## 🤝 Contributions and feature requests are welcome
 Please open an issue to discuss your ideas or suggestions.
-
+[![PyPI version](https://img.shields.io/pypi/v/modiodirect)](https://pypi.org/project/modiodirect/)
