@@ -9,18 +9,17 @@ Supports games like Space Engineers, SnowRunner, Deep Rock Galactic and more.
 
 
 ## Features
-- Official mod.io API only
-- Validates API key
-- Supports real mod.io URLs
-- Fallback search when slugs fail
-- Safe downloads with retries
-- Progress bar (tqdm optional)
-- Works on Windows & Linux
-- Optional `--no-config` for shared machines
-- Batch mode support
+- Uses only the official mod.io API
+- Validates API keys before use
+- Accepts standard mod.io URLs
+- Fallback search when slugs fail to resolve
+- Reliable downloads with automatic retries
+- Optional progress bar via tqdm
+- Runs on Windows and Linux
+- --no-config flag for shared or temporary environments
+- Batch mode for multiple mods
 - Optional auto‑install on Windows (opt‑in)
-- PyPI supported 
-
+- Available on PyPI
 ## Requirements
 - Python 3.9+
 - `pip install requests tqdm`
@@ -82,8 +81,7 @@ file:C:\path\to\mods.txt
 
 ## Why this exists
 
-Most mod.io download tools are broken, outdated, or unsafe—and frankly, frustrating to use. ModioDirect was made to fix that: simple, reliable, and safe. It gives you full control, letting you manually download mods with an API key and even bypass the official game client when needed. No clutter, no crashes, just the mods you want, when you want them.
-
+Existing download tools for mod.io often suffer from stability issues, lack of maintenance, or security concerns. ModioDirect addresses these shortcomings by providing a reliable and transparent alternative. It enables manual mod downloads via API key and offers the option to bypass the official game client, giving users greater control without unnecessary complexity
 
 ## Legal
 This tool uses the official mod.io API. Users are responsible for complying with mod.io's Terms of Service.
