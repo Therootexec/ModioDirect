@@ -1,4 +1,4 @@
-# ModioDirect v1.0.1 ![Python](https://img.shields.io/badge/python-3.9%2B-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+# ModioDirect v1.0.1 ![Python](https://img.shields.io/badge/python-3.9%2B-blue) ![License](https://img.shields.io/badge/license-MIT-green) !
 ![PyPI version](https://img.shields.io/pypi/v/modiodirect)
 
 **ModioDirect is a lightweight, single-file CLI that reliably downloads mods straight from mod.io via the official API—safe, fast, and free for use. It also allows manual downloads using an API key, bypassing the official game client.
