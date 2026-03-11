@@ -26,7 +26,8 @@ Supports games like Space Engineers, SnowRunner, Deep Rock Galactic and more.
 - Python 3.9+
 - `pip install requests tqdm`
 
-## Install From PyPI
+## Install From PyPI [![PyPI version](https://img.shields.io/pypi/v/modiodirect)](https://pypi.org/project/modiodirect/)
+
 ```bash
 pip install modiodirect
 ```
