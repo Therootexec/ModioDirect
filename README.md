@@ -115,7 +115,7 @@ OAuth support is not currently implemented in ModioDirect. Future updates may ad
 
 ## 🌟 Special Thanks
 
-Thanks to [@Diversion-CTF](https://github.com/diversionsec) For helping with the logo
+Thanks to [@Diversion](https://github.com/diversionsec) For helping with the logo
 
 ## 🤝 Contributions and feature requests are welcome
 Please open an issue to discuss your ideas or suggestions.
