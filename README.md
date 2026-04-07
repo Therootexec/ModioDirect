@@ -79,7 +79,8 @@ file:C:\path\to\mods.txt
    
 # *SIMPLY WALKTHROUGH*:
 <img width="1310" height="332" alt="Screenshot 2026-02-06 162920" src="https://github.com/user-attachments/assets/871142df-72c3-42b2-9655-f25d2b956488" />
-<img width="1094" height="368" alt="Screenshot 2026-02-06 164436" src="https://github.com/user-attachments/assets/f351d3f7-8bc0-46b5-8c8b-1fe03af22332" />
+<img width="1681" height="591" alt="image" src="https://github.com/user-attachments/assets/c3095948-03c1-42d5-9974-da73a0944c9f" />
+
 
 
 ## Why this exists
