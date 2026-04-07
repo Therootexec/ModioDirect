@@ -23,6 +23,35 @@ try:
 except Exception:
     requests = None
 
+try:
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.text import Text
+    from rich.align import Align
+    import rich.box
+    from rich.progress import (
+        Progress,
+        BarColumn,
+        DownloadColumn,
+        TransferSpeedColumn,
+        TimeRemainingColumn,
+        TaskProgressColumn,
+        TextColumn,
+    )
+except Exception:
+    Console = None
+    Panel = None
+    Text = None
+    Align = None
+    Progress = None
+    BarColumn = None
+    DownloadColumn = None
+    TransferSpeedColumn = None
+    TimeRemainingColumn = None
+    TaskProgressColumn = None
+    TextColumn = None
+    rich = None
+
 
 API_BASE = "https://api.mod.io/v1"
 VERSION = "1.0.1"
@@ -41,17 +70,48 @@ URL_REGEX = re.compile(
     re.IGNORECASE,
 )
 
+console = Console() if Console is not None else None
+
 
 def print_error(msg):
-    print(f"[Error] {msg}")
+    if console:
+        console.print(f"[bold red][Error][/bold red] {msg}")
+    else:
+        print(f"[Error] {msg}")
 
 
 def print_info(msg):
-    print(f"[Info] {msg}")
+    if console:
+        console.print(f"[bold cyan][Info][/bold cyan] {msg}")
+    else:
+        print(f"[Info] {msg}")
 
 
 def print_status(msg):
-    print(f"[Status] {msg}")
+    if console:
+        console.print(f"[bold blue][Status][/bold blue] {msg}")
+    else:
+        print(f"[Status] {msg}")
+
+
+def print_plain(msg):
+    if console:
+        console.print(msg)
+    else:
+        print(msg)
+
+
+def animate_status(base, dots=3, delay=0.15):
+    try:
+        for i in range(dots):
+            line = f"{base}{'.' * (i + 1)}"
+            sys.stdout.write("\r" + line)
+            sys.stdout.flush()
+            time.sleep(delay)
+        sys.stdout.write("\r" + base + " " * (dots + 2) + "\n")
+        sys.stdout.flush()
+    except Exception:
+        print_plain(base)
 
 
 def cleanup_temp_file(path):
@@ -119,14 +179,69 @@ def friendly_error(err):
 
 
 def print_banner():
-    print(r" __  __           _ _       _____  _               _   ")
-    print(r"|  \/  | ___   __| (_) ___ |  __ \(_)_ __ ___  ___| |_ ")
-    print(r"| |\/| |/ _ \ / _` | |/ _ \| |  | | | '__/ _ \/ __| __|")
-    print(r"| |  | | (_) | (_| | | (_) | |__| | | | |  __/ (__| |_ ")
-    print(r"|_|  |_|\___/ \__,_|_|\___/|_____/|_|_|  \___|\___|\__|")
-    print("\n             ModioDirect Downloader Tool")
-    print("                 by TheRootExec v1.0.1")
-    print("-------------------------------------------------------")
+    if console:
+        console.print("[bold cyan] __  __           _ _       _____  _               _   [/bold cyan]")
+        console.print("[bold cyan]|  \\/  | ___   __| (_) ___ |  __ \\(_)_ __ ___  ___| |_ [/bold cyan]")
+        console.print("[bold cyan]| |\\/| |/ _ \\ / _` | |/ _ \\| |  | | | '__/ _ \\/ __| __|[/bold cyan]")
+        console.print("[bold cyan]| |  | | (_) | (_| | | (_) | |__| | | | |  __/ (__| |_ [/bold cyan]")
+        console.print("[bold cyan]|_|  |_|\\___/ \\__,_|_|\\___/|_____/|_|_|  \\___|\\___|\\__|[/bold cyan]")
+        console.print("[bold white]\n             ModioDirect Downloader Tool[/bold white]")
+        console.print("[dim cyan]                 by TheRootExec v1.0.1[/dim cyan]")
+        console.print("[cyan]-------------------------------------------------------[/cyan]")
+    else:
+        print(r" __  __           _ _       _____  _               _   ")
+        print(r"|  \/  | ___   __| (_) ___ |  __ \(_)_ __ ___  ___| |_ ")
+        print(r"| |\/| |/ _ \ / _` | |/ _ \| |  | | | '__/ _ \/ __| __|")
+        print(r"| |  | | (_) | (_| | | (_) | |__| | | | |  __/ (__| |_ ")
+        print(r"|_|  |_|\___/ \__,_|_|\___/|_____/|_|_|  \___|\___|\__|")
+        print("\n             ModioDirect Downloader Tool")
+        print("                 by TheRootExec v1.0.1")
+        print("-------------------------------------------------------")
+
+
+def try_auto_install_rich():
+    global Console, Panel, Text, Align, Progress
+    if Console is not None and Panel is not None and Progress is not None:
+        return True
+    print_error("The 'rich' library is required but not installed.")
+    choice = input("Install requirements now? (y/n): ").strip().lower()
+    if choice != "y":
+        return False
+    try:
+        cmd = [sys.executable, "-m", "pip", "install", "rich"]
+        subprocess.run(cmd, check=False)
+    except Exception as exc:
+        print_error(f"Failed to run pip: {exc}")
+        return False
+    try:
+        from rich.console import Console as _Console
+        from rich.panel import Panel as _Panel
+        from rich.text import Text as _Text
+        from rich.align import Align as _Align
+        from rich.progress import (
+            Progress as _Progress,
+            BarColumn as _BarColumn,
+            DownloadColumn as _DownloadColumn,
+            TransferSpeedColumn as _TransferSpeedColumn,
+            TimeElapsedColumn as _TimeElapsedColumn,
+            TaskProgressColumn as _TaskProgressColumn,
+        )
+
+        Console = _Console
+        Panel = _Panel
+        Text = _Text
+        Align = _Align
+        Progress = _Progress
+        globals()["BarColumn"] = _BarColumn
+        globals()["DownloadColumn"] = _DownloadColumn
+        globals()["TransferSpeedColumn"] = _TransferSpeedColumn
+        globals()["TimeElapsedColumn"] = _TimeElapsedColumn
+        globals()["TaskProgressColumn"] = _TaskProgressColumn
+        globals()["console"] = Console()
+        return True
+    except Exception:
+        print_error("Rich is still not available after install attempt.")
+        return False
 
 
 def try_auto_install_requests():
@@ -170,6 +285,21 @@ def safe_request(method, url, **kwargs):
         return None
 
 
+def clear_screen():
+    try:
+        os.system("cls" if os.name == "nt" else "clear")
+    except Exception:
+        pass
+
+
+def print_saved_panel(path):
+    print_info(f"Saved as: {path}")
+
+
+def print_download_complete(filename, path):
+    return
+
+
 
 
 def load_config(config_path):
@@ -199,6 +329,11 @@ def validate_api_key(api_key):
     url = f"{API_BASE}/games"
     params = {"api_key": api_key, "limit": 1}
     headers = {"User-Agent": USER_AGENT}
+    if console:
+        with console.status("[cyan]Connecting to Mod.io...[/cyan]", spinner="dots"):
+            time.sleep(0.4)
+    else:
+        animate_status("Connecting", dots=3, delay=0.12)
     resp = safe_request("GET", url, params=params, headers=headers, timeout=15)
     if resp is None:
         return False, "Network error or requests missing."
@@ -278,7 +413,6 @@ def prompt_mod_url():
             if os.path.isfile(path):
                 return "BATCH_FILE", path, install_requested, force_requested
         if not raw:
-            print_error("URL cannot be empty.")
             continue
         match = URL_REGEX.search(raw)
         if not match:
@@ -707,6 +841,15 @@ def download_file(url, filename, expected_size=None, allow_existing=True):
                                 continue
                             f.write(chunk)
                             bar.update(len(chunk))
+                        # no-op
+                    try:
+                        bar.set_description("Downloaded", refresh=True)
+                    except Exception:
+                        try:
+                            bar.set_description_str("Downloaded")
+                            bar.refresh()
+                        except Exception:
+                            pass
                 else:
                     downloaded = 0
                     last_print = 0
@@ -737,7 +880,6 @@ def download_file(url, filename, expected_size=None, allow_existing=True):
                         continue
                 except Exception:
                     pass
-            print_status("Download complete.")
             return True, False, target
         except Exception:
             print_error("Unexpected error occurred.")
@@ -994,6 +1136,10 @@ def process_single_mod(api_key, game_slug, mod_slug, install_requested, force_re
         print_error("Missing game or mod slug.")
         return False, None, "", None, None, False, False
 
+    if console:
+        with console.status("[cyan]Fetching data...[/cyan]", spinner="dots"):
+            time.sleep(0.4)
+
     game_id, err = resolve_game_id(api_key, game_slug)
     if err:
         print_error(friendly_error(err))
@@ -1107,7 +1253,7 @@ def process_single_mod(api_key, game_slug, mod_slug, install_requested, force_re
     if ok:
         if not skipped and not install_requested:
             if filename:
-                print_info(f"Saved as: {os.path.join(DOWNLOAD_DIR, filename)}")
+                print_saved_panel(os.path.join(DOWNLOAD_DIR, filename))
         try:
             os.makedirs(DOWNLOAD_DIR, exist_ok=True)
             info_path = os.path.join(DOWNLOAD_DIR, "modinfo.json")
@@ -1141,6 +1287,10 @@ def process_single_mod(api_key, game_slug, mod_slug, install_requested, force_re
 
 
 def main():
+    clear_screen()
+    if not try_auto_install_rich():
+        print_error("Cannot continue without 'rich'.")
+        return
     print_banner()
     if not try_auto_install_requests():
         print_error("Cannot continue without 'requests'.")
