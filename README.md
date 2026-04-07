@@ -99,7 +99,8 @@ If you see:
 ```
 [Error] Mod is private, inaccessible, or requires authentication.
 ```
-<img width="874" height="360" alt="image" src="https://github.com/user-attachments/assets/269a632b-f982-43da-ba53-48da68162680" />
+<img width="1049" height="330" alt="image" src="https://github.com/user-attachments/assets/8e48bd14-9703-40db-9fe4-e73b71d8849e" />
+
 
 
 
