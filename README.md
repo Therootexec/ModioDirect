@@ -96,9 +96,10 @@ Some games/mods are private, unlisted, or require OAuth access. In those cases, 
 
 If you see:
 ```
-[Error] Game not accessible (404). The game may be private, unpublished, or require OAuth access.
+[Error] Mod is private, inaccessible, or requires authentication.
 ```
-<img width="1093" height="309" alt="Screenshot 2026-02-06 170047" src="https://github.com/user-attachments/assets/eb1148df-ef85-468f-a21b-d99cd26901db" />
+<img width="856" height="240" alt="image" src="https://github.com/user-attachments/assets/aaa4fc85-c482-406e-8702-f6fb01aa9d29" />
+
 
 
 API Key Limitations
