@@ -1297,7 +1297,7 @@ def main():
         return
 
     parser = argparse.ArgumentParser(
-        description="ModioDirect - crash-proof mod.io downloader",
+        description="ModioDirect - mod.io downloader",
         epilog=(
             "Examples:\n"
             "  python ModioDirect.py https://mod.io/g/spaceengineers/m/assault-weapons-pack1\n"
