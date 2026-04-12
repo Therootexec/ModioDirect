@@ -1,4 +1,4 @@
-# ModioDirect v1.0.1 ![Python](https://img.shields.io/badge/python-3.9%2B-blue) ![License](https://img.shields.io/badge/license-MIT-green) [![PyPI version](https://img.shields.io/pypi/v/modiodirect)](https://pypi.org/project/modiodirect/)
+# ModioDirect v1.0.1 ![Python](https://img.shields.io/badge/python-3.9%2B-blue) ![License](https://img.shields.io/badge/license-MIT-green) [![PyPI version](https://img.shields.io/pypi/v/modiodirect)](https://pypi.org/project/modiodirect/) [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/Therootexec/ModioDirect) [![GitHub Stars](https://img.shields.io/github/stars/Therootexec/ModioDirect?style=social)](https://github.com/Therootexec/ModioDirect)
 
 
 
