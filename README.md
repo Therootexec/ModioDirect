@@ -17,7 +17,6 @@ Supports games like Space Engineers, SnowRunner, Deep Rock Galactic and more.
 - Fallback search when slugs fail to resolve
 - Reliable downloads with automatic retries
 - Optional progress bar via tqdm
-- Runs on Windows and Linux
 - --no-config flag for shared or temporary environments
 - Batch mode for multiple mods
 - Optional auto‑install on Windows (opt‑in)
