@@ -92,7 +92,7 @@ This tool is not affiliated with, endorsed by, or officially supported by mod.io
 
 ## 🔴Access limitations (important)🔴
 
-Some games/mods are private, unlisted, or require OAuth access. In those cases, the mod.io API returns 404 even if the URL exists. This is an access restriction, not a bug in ModioDirect.
+Some games mods are private, unlisted, or require OAuth access. In those cases, the mod.io API returns 404 even if the URL exists. This is an access restriction, not a bug in ModioDirect.
 
 If you see:
 ```
