@@ -199,17 +199,51 @@ def print_banner():
         print("-------------------------------------------------------")
 
 
+def restart_script():
+    """
+    Restart the current script in a new process.
+    Works properly on Windows by using subprocess with CREATE_NEW_CONSOLE.
+    """
+    script_path = os.path.abspath(sys.argv[0])
+    args = sys.argv[1:]
+    
+    print("")
+    print("  Setup complete! Restarting ModioDirect...")
+    print("")
+    time.sleep(1)
+    
+    try:
+        if os.name == "nt":
+            # Windows: Start a new console window with the script
+            # Using START command to open in same window or new window
+            cmd = [sys.executable, script_path] + args
+            # Use CREATE_NEW_CONSOLE flag to ensure it opens properly
+            subprocess.Popen(
+                cmd,
+                creationflags=subprocess.CREATE_NEW_CONSOLE,
+                close_fds=True
+            )
+            sys.exit(0)
+        else:
+            # Unix: Use os.execv to replace the current process
+            os.execv(sys.executable, [sys.executable, script_path] + args)
+    except Exception as exc:
+        print(f"  [Notice] Could not restart automatically: {exc}")
+        print("")
+        print("  Please close this window and run the script again.")
+        print("")
+        input("  Press Enter to exit...")
+        sys.exit(0)
+
+
 def try_auto_install_requirements():
     """
     Check if both 'rich' and 'requests' are available.
-    If either is missing, prompt the user ONCE to install
-    all missing requirements together in a single pip call.
-    Returns True if all requirements are satisfied after the attempt.
+    If either is missing, prompt the user ONCE to install all missing
+    requirements together in a single pip call, then restart the script
+    automatically so the new packages are properly loaded.
+    Returns True if all requirements are satisfied (no install needed).
     """
-    global Console, Panel, Text, Align, Progress, requests
-    global BarColumn, DownloadColumn, TransferSpeedColumn
-    global TimeRemainingColumn, TaskProgressColumn, TextColumn, console
-
     rich_ok = Console is not None and Panel is not None and Progress is not None
     requests_ok = requests is not None
 
@@ -223,64 +257,62 @@ def try_auto_install_requirements():
     if not requests_ok:
         missing.append("requests")
 
-    missing_str = " ".join(missing)
-    print(f"[Error] The following required libraries are missing: {missing_str}")
-    choice = input("Install all requirements now? (y/n): ").strip().lower()
-    if choice != "y":
-        return False
+    missing_str = ", ".join(missing)
 
-    # Install all missing packages in ONE pip call
+    print("")
+    print("=" * 55)
+    print("  ModioDirect - First Time Setup")
+    print("=" * 55)
+    print(f"  Missing libraries: {missing_str}")
+    print("")
+    print("  These libraries are required to run ModioDirect.")
+    print("  They will be installed automatically via pip.")
+    print("=" * 55)
+    print("")
+
+    while True:
+        choice = input("  Install now and continue? (y/n): ").strip().lower()
+        if choice in ("y", "yes"):
+            break
+        elif choice in ("n", "no"):
+            print("")
+            print("  Setup cancelled. Please install manually:")
+            print(f"    pip install {' '.join(missing)}")
+            print("")
+            input("  Press Enter to exit...")
+            sys.exit(0)
+        else:
+            print("  Please type 'y' to install or 'n' to cancel.")
+
+    print("")
+    print("  Installing packages, please wait...")
+    print("-" * 55)
+
     try:
-        cmd = [sys.executable, "-m", "pip", "install"] + missing
-        subprocess.run(cmd, check=False)
+        cmd = [sys.executable, "-m", "pip", "install", "--user"] + missing
+        result = subprocess.run(cmd, check=False)
     except Exception as exc:
-        print(f"[Error] Failed to run pip: {exc}")
-        return False
+        print("")
+        print(f"  [Error] Failed to run pip: {exc}")
+        print("  Please install manually:")
+        print(f"    pip install {' '.join(missing)}")
+        print("")
+        input("  Press Enter to exit...")
+        sys.exit(1)
 
-    # Re-import rich if it was missing
-    if not rich_ok:
-        try:
-            from rich.console import Console as _Console
-            from rich.panel import Panel as _Panel
-            from rich.text import Text as _Text
-            from rich.align import Align as _Align
-            from rich.progress import (
-                Progress as _Progress,
-                BarColumn as _BarColumn,
-                DownloadColumn as _DownloadColumn,
-                TransferSpeedColumn as _TransferSpeedColumn,
-                TimeElapsedColumn as _TimeElapsedColumn,
-                TaskProgressColumn as _TaskProgressColumn,
-                TextColumn as _TextColumn,
-            )
+    print("-" * 55)
 
-            Console = _Console
-            Panel = _Panel
-            Text = _Text
-            Align = _Align
-            Progress = _Progress
-            globals()["BarColumn"] = _BarColumn
-            globals()["DownloadColumn"] = _DownloadColumn
-            globals()["TransferSpeedColumn"] = _TransferSpeedColumn
-            globals()["TimeElapsedColumn"] = _TimeElapsedColumn
-            globals()["TaskProgressColumn"] = _TaskProgressColumn
-            globals()["TextColumn"] = _TextColumn
-            globals()["console"] = Console()
-            console = globals()["console"]
-            rich_ok = True
-        except Exception:
-            print("[Error] 'rich' is still not available after install attempt.")
+    if result.returncode != 0:
+        print("")
+        print("  [Warning] Installation may have encountered issues.")
+        print("  Attempting to restart anyway...")
+        print("")
 
-    # Re-import requests if it was missing
-    if not requests_ok:
-        try:
-            import requests as _requests  # type: ignore
-            requests = _requests
-            requests_ok = True
-        except Exception:
-            print("[Error] 'requests' is still not available after install attempt.")
-
-    return rich_ok and requests_ok
+    # Restart the script so packages load fresh
+    restart_script()
+    
+    # Should not reach here, but just in case
+    return False
 
 
 def safe_json(resp):
@@ -1302,9 +1334,9 @@ def process_single_mod(api_key, game_slug, mod_slug, install_requested, force_re
 
 def main():
     clear_screen()
-    # Single prompt to install ALL missing requirements at once
+    # Check and install all missing requirements, then auto-restart if needed
     if not try_auto_install_requirements():
-        print_error("Cannot continue without required libraries ('rich', 'requests').")
+        # Should not reach here normally - restart handles everything
         return
     print_banner()
 
