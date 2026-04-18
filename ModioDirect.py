@@ -199,72 +199,88 @@ def print_banner():
         print("-------------------------------------------------------")
 
 
-def try_auto_install_rich():
-    global Console, Panel, Text, Align, Progress
-    if Console is not None and Panel is not None and Progress is not None:
+def try_auto_install_requirements():
+    """
+    Check if both 'rich' and 'requests' are available.
+    If either is missing, prompt the user ONCE to install
+    all missing requirements together in a single pip call.
+    Returns True if all requirements are satisfied after the attempt.
+    """
+    global Console, Panel, Text, Align, Progress, requests
+    global BarColumn, DownloadColumn, TransferSpeedColumn
+    global TimeRemainingColumn, TaskProgressColumn, TextColumn, console
+
+    rich_ok = Console is not None and Panel is not None and Progress is not None
+    requests_ok = requests is not None
+
+    if rich_ok and requests_ok:
         return True
-    print_error("The 'rich' library is required but not installed.")
-    choice = input("Install requirements now? (y/n): ").strip().lower()
+
+    # Build list of missing packages
+    missing = []
+    if not rich_ok:
+        missing.append("rich")
+    if not requests_ok:
+        missing.append("requests")
+
+    missing_str = " ".join(missing)
+    print(f"[Error] The following required libraries are missing: {missing_str}")
+    choice = input("Install all requirements now? (y/n): ").strip().lower()
     if choice != "y":
         return False
+
+    # Install all missing packages in ONE pip call
     try:
-        cmd = [sys.executable, "-m", "pip", "install", "rich"]
+        cmd = [sys.executable, "-m", "pip", "install"] + missing
         subprocess.run(cmd, check=False)
     except Exception as exc:
-        print_error(f"Failed to run pip: {exc}")
-        return False
-    try:
-        from rich.console import Console as _Console
-        from rich.panel import Panel as _Panel
-        from rich.text import Text as _Text
-        from rich.align import Align as _Align
-        from rich.progress import (
-            Progress as _Progress,
-            BarColumn as _BarColumn,
-            DownloadColumn as _DownloadColumn,
-            TransferSpeedColumn as _TransferSpeedColumn,
-            TimeElapsedColumn as _TimeElapsedColumn,
-            TaskProgressColumn as _TaskProgressColumn,
-        )
-
-        Console = _Console
-        Panel = _Panel
-        Text = _Text
-        Align = _Align
-        Progress = _Progress
-        globals()["BarColumn"] = _BarColumn
-        globals()["DownloadColumn"] = _DownloadColumn
-        globals()["TransferSpeedColumn"] = _TransferSpeedColumn
-        globals()["TimeElapsedColumn"] = _TimeElapsedColumn
-        globals()["TaskProgressColumn"] = _TaskProgressColumn
-        globals()["console"] = Console()
-        return True
-    except Exception:
-        print_error("Rich is still not available after install attempt.")
+        print(f"[Error] Failed to run pip: {exc}")
         return False
 
+    # Re-import rich if it was missing
+    if not rich_ok:
+        try:
+            from rich.console import Console as _Console
+            from rich.panel import Panel as _Panel
+            from rich.text import Text as _Text
+            from rich.align import Align as _Align
+            from rich.progress import (
+                Progress as _Progress,
+                BarColumn as _BarColumn,
+                DownloadColumn as _DownloadColumn,
+                TransferSpeedColumn as _TransferSpeedColumn,
+                TimeElapsedColumn as _TimeElapsedColumn,
+                TaskProgressColumn as _TaskProgressColumn,
+                TextColumn as _TextColumn,
+            )
 
-def try_auto_install_requests():
-    global requests
-    if requests is not None:
-        return True
-    print_error("The 'requests' library is required but not installed.")
-    choice = input("Install requirements now? (y/n): ").strip().lower()
-    if choice != "y":
-        return False
-    try:
-        cmd = [sys.executable, "-m", "pip", "install", "requests"]
-        subprocess.run(cmd, check=False)
-    except Exception as exc:
-        print_error(f"Failed to run pip: {exc}")
-        return False
-    try:
-        import requests as _requests  # type: ignore
-        requests = _requests
-        return True
-    except Exception:
-        print_error("Requests is still not available after install attempt.")
-        return False
+            Console = _Console
+            Panel = _Panel
+            Text = _Text
+            Align = _Align
+            Progress = _Progress
+            globals()["BarColumn"] = _BarColumn
+            globals()["DownloadColumn"] = _DownloadColumn
+            globals()["TransferSpeedColumn"] = _TransferSpeedColumn
+            globals()["TimeElapsedColumn"] = _TimeElapsedColumn
+            globals()["TaskProgressColumn"] = _TaskProgressColumn
+            globals()["TextColumn"] = _TextColumn
+            globals()["console"] = Console()
+            console = globals()["console"]
+            rich_ok = True
+        except Exception:
+            print("[Error] 'rich' is still not available after install attempt.")
+
+    # Re-import requests if it was missing
+    if not requests_ok:
+        try:
+            import requests as _requests  # type: ignore
+            requests = _requests
+            requests_ok = True
+        except Exception:
+            print("[Error] 'requests' is still not available after install attempt.")
+
+    return rich_ok and requests_ok
 
 
 def safe_json(resp):
@@ -298,8 +314,6 @@ def print_saved_panel(path):
 
 def print_download_complete(filename, path):
     return
-
-
 
 
 def load_config(config_path):
@@ -1288,13 +1302,11 @@ def process_single_mod(api_key, game_slug, mod_slug, install_requested, force_re
 
 def main():
     clear_screen()
-    if not try_auto_install_rich():
-        print_error("Cannot continue without 'rich'.")
+    # Single prompt to install ALL missing requirements at once
+    if not try_auto_install_requirements():
+        print_error("Cannot continue without required libraries ('rich', 'requests').")
         return
     print_banner()
-    if not try_auto_install_requests():
-        print_error("Cannot continue without 'requests'.")
-        return
 
     parser = argparse.ArgumentParser(
         description="ModioDirect - mod.io downloader",
