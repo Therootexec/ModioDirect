@@ -130,7 +130,7 @@ New stuff:
   --check-updates, --export, --rollback, --build-select, --profile, --debug
 
 ## New config files:
- - profiles.json, locked_mods.json, local_library.json more details coming...
+  --profiles.json, --locked_mods.json, --local_library.json more details coming...
 
 
 ## On (bata)
