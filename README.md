@@ -111,7 +111,7 @@ API keys can only access publicly available content.
 Private or unlisted mods are not accessible using API keys alone, as they require OAuth-based authentication.
 OAuth support is not currently implemented in ModioDirect. Future updates may add OAuth support if permitted by mod.io’s policies.
 
-## ModioDirect v1.0.2 – upcoming release ("5.25.2026")
+## ModioDirect v1.0.2 – upcoming release ("5.25-26.2026")
 New stuff:
 - Mod Profiles – save/load different mod collections
 - Version Locking – pin mods to specific versions
@@ -123,7 +123,7 @@ New stuff:
 - Update Checker – see available updates
 - Build Selector – pick any file version to download - thanks to [@VaelophisNyx](https://github.com/VaelophisNyx) for the idea
 - Rollback – download older versions
-- Platform Scoring – auto-selects PC files, avoids console builds - reported by [Lazyfluf](https://mod.io/g/snowrunner/u/lazyfluf)
+- Platform Scoring – auto-selects PC files, avoids console builds - reported by [Lazyfluf](https://mod.io/u/lazyfluf)
 - Dependency Warnings – detects missing requirements
 
 ## New CLI:
