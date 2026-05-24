@@ -114,6 +114,7 @@ OAuth support is not currently implemented in ModioDirect. Future updates may ad
 ## ModioDirect v1.0.2 – upcoming release ("5.25-26.2026")
 New stuff:
 - Mod Profiles – save/load different mod collections
+- Build Selector – pick any file version to download - thanks to [@VaelophisNyx](https://github.com/VaelophisNyx) for the idea
 - Version Locking – pin mods to specific versions
 - Auto Backups – old versions saved before updates
 - Offline Library – see every downloaded file, not just latest
@@ -121,7 +122,6 @@ New stuff:
 - Storage Analyzer – track disk usage by mod
 - Export/Import – share mod lists (JSON or TXT)
 - Update Checker – see available updates
-- Build Selector – pick any file version to download - thanks to [@VaelophisNyx](https://github.com/VaelophisNyx) for the idea
 - Rollback – download older versions
 - Platform Scoring – auto-selects PC files, avoids console builds - reported by [Lazyfluf](https://mod.io/u/lazyfluf)
 - Dependency Warnings – detects missing requirements
