@@ -121,15 +121,16 @@ New stuff:
 - Storage Analyzer – track disk usage by mod
 - Export/Import – share mod lists (JSON or TXT)
 - Update Checker – see available updates
-- Build Selector – pick any file version to download - thanks to @VaelophisNyx for the idea
+- Build Selector – pick any file version to download - thanks to [@VaelophisNyx](https://github.com/VaelophisNyx) for the idea
 - Rollback – download older versions
-- Platform Scoring – auto-selects PC files, avoids console builds - reported by @lazyfluf
+- Platform Scoring – auto-selects PC files, avoids console builds - reported by [Lazyfluf](https://mod.io/g/snowrunner/u/lazyfluf)
 - Dependency Warnings – detects missing requirements
 
-New CLI:
---check-updates, --export, --rollback, --build-select, --profile, --debug
-New config files:
-profiles.json, locked_mods.json, local_library.json more details coming...
+## New CLI:
+  --check-updates, --export, --rollback, --build-select, --profile, --debug
+
+## New config files:
+ - profiles.json, locked_mods.json, local_library.json more details coming...
 
 
 ## On (bata)
