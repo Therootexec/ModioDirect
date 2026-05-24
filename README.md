@@ -111,12 +111,30 @@ API keys can only access publicly available content.
 Private or unlisted mods are not accessible using API keys alone, as they require OAuth-based authentication.
 OAuth support is not currently implemented in ModioDirect. Future updates may add OAuth support if permitted by mod.io’s policies.
 
-## Upcoming Features Updates
- ModioDirect is actively maintained. The following features are planned for future releases:
+## ModioDirect v1.0.2 – upcoming release ("5.25.2026")
+New stuff:
+- Mod Profiles – save/load different mod collections
+- Version Locking – pin mods to specific versions
+- Auto Backups – old versions saved before updates
+- Offline Library – see every downloaded file, not just latest
+- Integrity Scanner – find and repair broken mods
+- Storage Analyzer – track disk usage by mod
+- Export/Import – share mod lists (JSON or TXT)
+- Update Checker – see available updates
+- Build Selector – pick any file version to download - thanks to @VaelophisNyx for the idea
+- Rollback – download older versions
+- Platform Scoring – auto-selects PC files, avoids console builds - reported by @lazyfluf
+- Dependency Warnings – detects missing requirements
+
+New CLI:
+--check-updates, --export, --rollback, --build-select, --profile, --debug
+New config files:
+profiles.json, locked_mods.json, local_library.json more details coming...
+
+
+## On (bata)
 - Windows standalone executable (.exe)
-  A portable build for Windows users that does not require Python.
-
-
+  
 ## 🌟 Special Thanks
 
 Thanks to [@Diversion](https://github.com/diversionsec) 
