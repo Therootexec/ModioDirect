@@ -48,13 +48,10 @@ CLI Additions:
 
 New Files
 |File 	                       | Purpose               |
-|:---------------------------- | :---------------------|
+| :--------------------------- | :---------------------|
 | profiles.json	               | Profile storage       |
-|:---------------------------- |:----------------------|
-| locked_mods.json	       | Version lock tracking |
-|:---------------------------- |:----------------------|
-| local_library.json	       |Offline library index  |
-|:---------------------------- |:----------------------|
+| locked_mods.json	           | Version lock tracking |
+| local_library.json	         |Offline library index  |
 | backups/backup_manifest.json |Backup tracking        |       
 
 Full code on GitHub: https://github.com/Therootexec/ModioDirect
