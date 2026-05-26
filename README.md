@@ -82,7 +82,8 @@ Run: modiodirect.py
 # *SIMPLY WALKTHROUGH*:
 - Go to your [mod.io/me/access](https://mod.io/me/access) and copy:
 <img width="1310" height="332" alt="Screenshot 2026-02-06 162920" src="https://github.com/user-attachments/assets/871142df-72c3-42b2-9655-f25d2b956488" />
-<img width="1681" height="591" alt="image" src="https://github.com/user-attachments/assets/c3095948-03c1-42d5-9974-da73a0944c9f" />
+<img width="1310" height="332" alt="Screenshot 2026-05-26 180452" src="https://github.com/user-attachments/assets/4959068a-7699-4c83-8bf6-6e5ea2985449" />
+
 
 ## Auto-Install (Windows Only) :(Requires the games.json to work)
 Install directly to a detected game mod folder (optional):
@@ -113,7 +114,8 @@ If you see:
 ```
 [Error] Mod is private, inaccessible, or requires authentication.
 ```
-<img width="1049" height="330" alt="Screenshot 2026-04-07 205312" src="https://github.com/user-attachments/assets/e3b78528-abd3-4361-95ed-efc06eafd685" />
+<img width="907" height="240" alt="Screenshot 2026-05-26 175602" src="https://github.com/user-attachments/assets/82d0d83a-5722-4851-8622-abda0c18664b" />
+
 
 
 ## API Key Limitations
