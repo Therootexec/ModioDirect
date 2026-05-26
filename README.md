@@ -82,7 +82,8 @@ Run: modiodirect.py
 # *SIMPLY WALKTHROUGH*:
 - Go to your [mod.io/me/access](https://mod.io/me/access) and copy:
 <img width="1310" height="332" alt="Screenshot 2026-02-06 162920" src="https://github.com/user-attachments/assets/871142df-72c3-42b2-9655-f25d2b956488" />
-<img width="1310" height="332" alt="Screenshot 2026-05-26 180452" src="https://github.com/user-attachments/assets/4959068a-7699-4c83-8bf6-6e5ea2985449" />
+<img width="1780" height="756" alt="Screenshot 2026-05-26 180452" src="https://github.com/user-attachments/assets/b5997142-399e-4637-99ec-45da85fe4052" />
+
 
 
 ## Auto-Install (Windows Only) :(Requires the games.json to work)
