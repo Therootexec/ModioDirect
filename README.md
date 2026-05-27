@@ -62,7 +62,7 @@
 - Install dependencies:
   --requests,--rich,--tqdm
 
-## Installation from PyPI
+## Installation from PyPI [![PyPI version](https://img.shields.io/pypi/v/modiodirect)](https://pypi.org/project/modiodirect/)
 ```
 pip install modiodirect
 ```
