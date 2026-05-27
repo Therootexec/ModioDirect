@@ -23,7 +23,7 @@
 ### New in v1.0.2
 
 - **Mod Profiles** – save and load different mod collections
-- **Build Selector** – pick any file version to download (thanks to [@VaelophisNyx](https://github.com/VaelophisNyx))
+- **Build Selector** – pick any file version to download 
 - **Version Locking** – pin mods to specific versions
 - **Auto Backups** – old versions saved before updates
 - **Offline Library** – view every downloaded file, not just the latest
