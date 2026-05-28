@@ -54,4 +54,4 @@ New Files
 | local_library.json	         |Offline library index  |
 | backups/backup_manifest.json |Backup tracking        |       
 
-Full code on GitHub: https://github.com/Therootexec/ModioDirect
+Full code on GitHub: [ModioDirect.py](https://github.com/Therootexec/ModioDirect/blob/v.1.0.2/ModioDirect_v1.0.2.py)
