@@ -53,7 +53,7 @@
 | local_library.json	          | Offline library index |
 | backups/backup_manifest.json | Backup tracking       |
 
-> Additional details are provided in the [ModioDirect/docs](https://github.com/Therootexec/ModioDirect/blob/test/docs/What's%20New.md)
+> Additional details are provided in the [ModioDirect/docs](https://github.com/Therootexec/ModioDirect/blob/v.1.0.2/docs/What's%20New.md)
 
 ---
 
