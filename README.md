@@ -32,7 +32,7 @@
 - **Export/Import** – share mod lists (JSON or TXT)
 - **Update Checker** – see available updates
 - **Rollback** – download older versions
-- **Platform Scoring** – auto-selects PC files, avoids console builds (reported by [Lazyfluf](https://mod.io/u/lazyfluf))
+- **Platform Scoring** – auto-selects PC files, avoids console builds
 - **Dependency Warnings** – detects missing requirements
 
 ### New CLI Options
